@@ -1,12 +1,10 @@
 from datetime import date, datetime
 from typing import List, Optional
 from pydantic import BaseModel, validator, PositiveInt
-from enum import Enum
+from enums import Gender
 
 
-class Gender(Enum):
-    Male = 'M'
-    Female = 'F'
+
 
 
 
