@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from typing import ClassVar, List, Optional
 from pydantic import BaseModel, validator, PositiveInt
 from pydantic.fields import PrivateAttr
@@ -32,8 +32,6 @@ class Player(BaseModel):
         super().__init__(**data)
         self.id = next(Player._id_count)
 
+    def whoami(self) -> str:
+        return f"First name: {self.first_name} \nLast name: {self.last_name} \nGender: {self.gender.value} \nRanking: {self.ranking}\nBirthdate: {self.birthdate}"
     
-
-
-print(Player(first_name='John90àç', last_name='Doe', birthdate='2010-03-30', ranking=2789, gender=Gender.Male))
-print(Player(first_name='JORDI', last_name='SHORE', birthdate='2010-03-30', ranking=2789, gender=Gender.Male))
