@@ -1,18 +1,20 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import Dict, List 
-from store import view_data
+from store import view_data, app_data
 import os
+from manager import Manager
 
 
 class ContentLoader:
-    """Loads view content from view data store"""
-    content: Dict = view_data
+    """Loads view content from data store"""
+    view_text_content: Dict = view_data
+    view_app_data: Dict = app_data
 
     def load_content(self, view, key: str):
         if isinstance(view, Menu):
             for attr in view.get_own_attributes():
-                setattr(view, attr, self.content[key][attr])
+                setattr(view, attr, self.view_text_content[key][attr])
        
 
 @dataclass
@@ -20,15 +22,17 @@ class View(ABC):
     """View parent class"""
     title: str 
     info: List[str] 
-    main: Dict 
+    main: List 
     prompt: str
+    __view_manager: Manager
+    __data_manager: Manager
  
     def __init__(self) -> None:
         super().__init__()
         # attributes have to be initialized here since get_own_attributes cannot list uninitialized attributes (dir() does not offer the possibility)
         self.title = ''
         self.info = []
-        self.main = {}
+        self.main = []
         self.prompt = ''
 
     def get_own_attributes(self):
@@ -56,12 +60,12 @@ class View(ABC):
     @abstractmethod
     def display_main(self):
         print('\n')
-        for attr,value in self.main.items():
-            print(value['text'])
+        for item in self.main:
+            print(item['text'])
     
     @abstractmethod
     def display_prompt(self):
-        print('\n' + self.prompt + '\n')
+        print('\n' + self.prompt)
 
 
 
@@ -100,4 +104,4 @@ class Menu(View):
 
 menu = Menu(ContentLoader(), 'MAIN_MENU')
 
-print(menu)
+menu.render()
