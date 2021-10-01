@@ -16,6 +16,7 @@ class Player(BaseModel):
     first_name: constr(strip_whitespace=True, min_length=2, max_length=25)
     last_name: constr(strip_whitespace=True, min_length=2, max_length=25)
     #players must be at least 6
+    # [TODO] add date format hint for user (yyyy-mm-dd)
     birthdate: date
     ranking: PositiveInt
     gender: Gender
@@ -32,6 +33,7 @@ class Player(BaseModel):
         super().__init__(**data)
         self.id = next(Player._id_count)
 
-    def whoami(self) -> str:
+    # Class's string representation
+    def __repr__(self):
         return f"First name: {self.first_name} \nLast name: {self.last_name} \nGender: {self.gender.value} \nRanking: {self.ranking}\nBirthdate: {self.birthdate}"
     
