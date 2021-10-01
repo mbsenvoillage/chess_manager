@@ -1,31 +1,48 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import Dict, List 
 from store import view_data
 import os
 
 
+class ContentLoader:
+    """Loads view content from view data store"""
+    content: Dict = view_data
+
+    def load_content(self, view, key: str):
+        if isinstance(view, Menu):
+            for attr in view.get_own_attributes():
+                setattr(view, attr, self.content[key][attr])
+       
 
 @dataclass
 class View(ABC):
-    title: str
-    info: List[str]
-    main: Dict
+    """View parent class"""
+    title: str 
+    info: List[str] 
+    main: Dict 
     prompt: str
-
+ 
     def __init__(self) -> None:
         super().__init__()
+        # attributes have to be initialized here since get_own_attributes cannot list uninitialized attributes (dir() does not offer the possibility)
+        self.title = ''
+        self.info = []
+        self.main = {}
+        self.prompt = ''
+
+    def get_own_attributes(self):
+        """Lists attributes of the view instance"""
+        return [a for a in dir(self) if not a.startswith('__') and not callable(getattr(self, a)) and not a.startswith('_')]
 
     @abstractmethod
     def render(self):
+        """Renders the view"""
         pass
 
     @abstractmethod
     def submit(self, input_type, manager):
-        pass
-
-    @abstractmethod
-    def load_content(self):
+        """Submits user input to manager"""
         pass
 
     @abstractmethod
@@ -34,9 +51,7 @@ class View(ABC):
 
     @abstractmethod
     def display_info(self):
-        print('\n')
-        for item in self.info:
-            print(item)
+        pass
         
     @abstractmethod
     def display_main(self):
@@ -49,20 +64,14 @@ class View(ABC):
         print('\n' + self.prompt + '\n')
 
 
+
+
 class Menu(View):
 
-    def __init__(self, view_data, key) -> None:
+    def __init__(self, content_loader: ContentLoader,key) -> None:
         super().__init__()
-        self.key = key
-        self.load_content(view_data[self.key])
+        content_loader.load_content(self, key)
         
-
-    def load_content(self, content):
-        self.title = content['title']
-        self.info = content['info']
-        self.main = content['main']
-        self.prompt = content['prompt']
-
     def submit(self, input_type, manager):
         return super().submit(input_type, manager)
 
@@ -77,7 +86,9 @@ class Menu(View):
         return super().display_title()
 
     def display_info(self):
-        return super().display_info()
+        print('\n')
+        for item in self.info:
+            print(item)
     
     def display_main(self):
         return super().display_main()
@@ -85,6 +96,8 @@ class Menu(View):
     def display_prompt(self):
         return super().display_prompt()
 
-menu = Menu(view_data, 'MAIN_MENU')
 
-menu.render()
+
+menu = Menu(ContentLoader(), 'MAIN_MENU')
+
+print(menu)
