@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from typing import Dict, List 
 from store import view_data, app_data
 import os
-from manager import Manager
+import manager
+
 
 
 class ContentLoader:
@@ -11,10 +12,19 @@ class ContentLoader:
     view_text_content: Dict = view_data
     view_app_data: Dict = app_data
 
-    def load_content(self, view, key: str):
-        if isinstance(view, Menu):
-            for attr in view.get_own_attributes():
+    def assemble_option_list(self, data_type):
+        option_list = []
+        if data_type == 'player':
+            for player in self.app_data['players']:
+                option_list.append(f"{player.id}. {player.first_name} {player.last_name}")
+        return option_list
+
+    def load_content(self, view, key: str, assembly_func=None) -> None:
+        for attr in view.get_own_attributes():
                 setattr(view, attr, self.view_text_content[key][attr])
+        if assembly_func is not None:
+            setattr(view, 'main', assembly_func())
+        return 
        
 
 @dataclass
@@ -24,16 +34,18 @@ class View(ABC):
     info: List[str] 
     main: List 
     prompt: str
-    __view_manager: Manager
-    __data_manager: Manager
+    _view_manager: manager.ViewManager
+    _data_manager: manager.PlayerManager
  
-    def __init__(self) -> None:
+    def __init__(self, data_manager) -> None:
         super().__init__()
         # attributes have to be initialized here since get_own_attributes cannot list uninitialized attributes (dir() does not offer the possibility)
         self.title = ''
         self.info = []
         self.main = []
         self.prompt = ''
+        self._data_manager = data_manager
+        self._view_manager = manager.ViewManager
 
     def get_own_attributes(self):
         """Lists attributes of the view instance"""
@@ -48,6 +60,15 @@ class View(ABC):
     def submit(self, input_type, manager):
         """Submits user input to manager"""
         pass
+
+    def clear_terminal():
+        os.system('cls' if os.name == 'nt' else 'reset')
+
+    
+    def capture_input(self, prompt):
+        to_submit = input(prompt)
+        print('You submitted ' + to_submit)
+        return to_submit
 
     @abstractmethod
     def display_title(self):
@@ -65,26 +86,26 @@ class View(ABC):
     
     @abstractmethod
     def display_prompt(self):
-        print('\n' + self.prompt)
+        return '\n' + self.prompt
 
 
 
 
 class Menu(View):
 
-    def __init__(self, content_loader: ContentLoader,key) -> None:
-        super().__init__()
+    def __init__(self, data_manager, content_loader: ContentLoader,key) -> None:
+        super().__init__(data_manager)
         content_loader.load_content(self, key)
         
     def submit(self, input_type, manager):
         return super().submit(input_type, manager)
 
     def render(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
+        self.clear_terminal()
         self.display_title()
         self.display_info()
         self.display_main()
-        self.display_prompt()
+        self.capture_input(self.display_prompt())
 
     def display_title(self):
         return super().display_title()
@@ -101,7 +122,5 @@ class Menu(View):
         return super().display_prompt()
 
 
-
-menu = Menu(ContentLoader(), 'MAIN_MENU')
-
+menu = Menu(manager.PlayerManager(), ContentLoader(), 'MAIN_MENU')
 menu.render()
