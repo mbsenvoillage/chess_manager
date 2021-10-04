@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
-from typing import Dict, List 
+from typing import Dict, List, Optional
 from store import view_data, app_data
 import os
 import manager
@@ -11,19 +11,27 @@ class ContentLoader:
     """Loads view content from data store"""
     view_text_content: Dict = view_data
     view_app_data: Dict = app_data
+    data_to_assemble: str
 
-    def assemble_option_list(self, data_type):
+    def __init__(self, data_to_assemble=None) -> None:
+        self.data_to_assemble = data_to_assemble
+
+ 
+    def assemble_option_list(self, data_to_assemble):
         option_list = []
-        if data_type == 'player':
-            for player in self.app_data['players']:
+        if data_to_assemble == 'player':
+            for player in self.view_app_data['players']:
                 option_list.append(f"{player.id}. {player.first_name} {player.last_name}")
+        else:
+            for tournament in self.view_app_data['tournaments']:
+                option_list.append(f"{tournament.id}. {tournament.venue}")  
         return option_list
 
-    def load_content(self, view, key: str, assembly_func=None) -> None:
+    def load_content(self, view, key: str):
         for attr in view.get_own_attributes():
                 setattr(view, attr, self.view_text_content[key][attr])
-        if assembly_func is not None:
-            setattr(view, 'main', assembly_func())
+        if self.data_to_assemble is not None:
+            setattr(view, 'main', self.assemble_option_list(self.data_to_assemble))
         return 
        
 
@@ -61,10 +69,6 @@ class View(ABC):
         """Submits user input to manager"""
         pass
 
-    def clear_terminal():
-        os.system('cls' if os.name == 'nt' else 'reset')
-
-    
     def capture_input(self, prompt):
         to_submit = input(prompt)
         print('You submitted ' + to_submit)
@@ -78,6 +82,7 @@ class View(ABC):
     def display_info(self):
         pass
         
+    #[TODO] a different implementation of this method should be given for menus displaying dynamic list of options
     @abstractmethod
     def display_main(self):
         print('\n')
@@ -101,7 +106,7 @@ class Menu(View):
         return super().submit(input_type, manager)
 
     def render(self):
-        self.clear_terminal()
+        os.system('cls' if os.name == 'nt' else 'reset')
         self.display_title()
         self.display_info()
         self.display_main()
@@ -122,5 +127,8 @@ class Menu(View):
         return super().display_prompt()
 
 
-menu = Menu(manager.PlayerManager(), ContentLoader(), 'MAIN_MENU')
-menu.render()
+# menu = Menu(manager.PlayerManager(), ContentLoader(), 'MAIN_MENU')
+# menu.render()
+
+player_menu = Menu(manager.PlayerManager(), ContentLoader('player'), 'MAIN_MENU')
+player_menu.render()

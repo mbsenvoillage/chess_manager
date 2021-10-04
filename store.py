@@ -14,6 +14,11 @@ view_data = {
         'info': ['Welcome to Chess Manager, your companion to successful chess tournament management.', 'Pick an option from the list below and press enter.'],
         'main': [{'text': '1. Manage Players', 'route': '/playermenu'}, {'text' : '2. Manage Tournaments', 'route': '/tournamentmenu'}, {'text': '3. Generate Data Reports', 'route': '/reportsmenu'}, {'text': '4. Manage App Data', 'route': '/appdatamenu'}, {'text': '5. Quit', 'route': '/exit'}],
         'prompt': '>>> '
+    },
+    'PLAYER_MENU': {
+        'title': 'Edit Players',
+        'info': ['Select a player to edit any data from its profile, like ranking.', 'Pick an option from the list below and press enter.'],
+        'prompt': '>>>'
     }
 }
 
