@@ -12,10 +12,16 @@ view_data = {
     'MAIN_MENU': {
         'title': 'Welcome to ChessManager 1.0',
         'info': ['Welcome to Chess Manager, your companion to successful chess tournament management.', 'Pick an option from the list below and press enter.'],
-        'main': [{'text': '1. Manage Players', 'route': '/playermenu'}, {'text' : '2. Manage Tournaments', 'route': '/tournamentmenu'}, {'text': '3. Generate Data Reports', 'route': '/reportsmenu'}, {'text': '4. Manage App Data', 'route': '/appdatamenu'}, {'text': '5. Quit', 'route': '/exit'}],
+        'main': [{'text': '1. Manage Players', 'route': '/player'}, {'text' : '2. Manage Tournaments', 'route': '/tournament'}, {'text': '3. Generate Data Reports', 'route': '/reports'}, {'text': '4. Manage App Data', 'route': '/appdata'}, {'text': '5. Quit', 'route': '/exit'}],
         'prompt': '>>> '
     },
     'PLAYER_MENU': {
+        'title': 'Player Menu',
+        'info': ['Create a new player, or edit an existing one.', 'Pick an option from the list below and press enter.'],
+        'main': [{'text': '1. Create Player', 'route': '/player/create'}, {'text' : '2. Edit Player', 'route': '/player/edit'}],
+        'prompt': '>>>'
+    },
+    'PLAYER_EDIT': {
         'title': 'Edit Players',
         'info': ['Select a player to edit any data from its profile, like ranking.', 'Pick an option from the list below and press enter.'],
         'prompt': '>>>'

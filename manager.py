@@ -1,8 +1,6 @@
-from typing import Dict, List
-from player import Player
-from abc import ABC, abstractmethod
+from typing import Dict
+from abc import ABC
 import validator
-import store
 
 class DataManager(ABC):
 
@@ -21,16 +19,3 @@ class PlayerManager(DataManager):
 
     def add_player():
         pass
-
-class ViewManager():
-
-    app_data: Dict = store.app_data
-
-    def assemble_option_list(self, data_type):
-        option_list = []
-        if data_type == 'player':
-            for player in self.app_data['players']:
-                option_list.append(f"{player.id}. {player.first_name} {player.last_name}")
-        return option_list
-
-print(ViewManager().assemble_option_list('player'))
