@@ -17,13 +17,20 @@ view_data = {
     },
     'PLAYER_MENU': {
         'title': 'Player Menu',
-        'info': ['Create a new player, or edit an existing one.', 'Pick an option from the list below and press enter.'],
+        'info': ['Create a new player, or edit an existing one.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
         'main': [{'text': '1. Create Player', 'route': '/player/create'}, {'text' : '2. Edit Player', 'route': '/player/edit'}],
         'prompt': '>>>'
     },
     'PLAYER_EDIT': {
         'title': 'Edit Players',
-        'info': ['Select a player to edit any data from its profile, like ranking.', 'Pick an option from the list below and press enter.'],
+        'info': ['Select a player to edit any data from its profile, like ranking.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
+        'main':[],
+        'prompt': '>>>'
+    },
+    'TOURNAMENT_MENU': {
+        'title': 'Tournament Menu',
+        'info': ['Create a new tournament, or edit an existing one.','Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
+        'main': [{'text': '1. Create Tournament', 'route': '/tournament/create'}, {'text' : '2. Edit Tournament', 'route': '/tournament/edit'}],
         'prompt': '>>>'
     }
 }

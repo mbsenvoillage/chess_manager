@@ -115,7 +115,10 @@ class Menu(View):
     
     def capture_input(self, prompt):
         selected_option = input(prompt)
-        to_submit = self.main[int(selected_option) - 1]['route']
+        if selected_option == 'q':
+            self._view_manager.router('/')
+        else:
+            to_submit = self.main[int(selected_option) - 1]['route']
         return to_submit
 
 

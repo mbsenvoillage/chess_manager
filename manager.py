@@ -27,4 +27,7 @@ class ViewManager():
     route_map: Dict 
 
     def router(self,route):
-        self.route_map[route].render()
+        if route == '/exit':
+            self.route_map[route]()
+        else:
+            self.route_map[route].render()
