@@ -10,7 +10,7 @@ import itertools
 
 class Player(BaseModel):
     _id_count = itertools.count(1)
-    id: PositiveInt = PrivateAttr
+    _id: PositiveInt = PrivateAttr()
     # [TODO] first name must not contain more than 25 letters and less than 2
     # may contain spaces, accents, dashes
     # may not contain numbers, special charactersc
@@ -32,7 +32,7 @@ class Player(BaseModel):
 
     def __init__(self, **data) -> None:
         super().__init__(**data)
-        self.id = next(Player._id_count)
+        self._id = next(Player._id_count)
 
     # Class's string representation
     def __repr__(self):

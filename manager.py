@@ -1,6 +1,7 @@
 from typing import Dict
 from abc import ABC
 import validator
+from view import ContentLoader, Menu
 
 class DataManager(ABC):
 
@@ -19,3 +20,11 @@ class PlayerManager(DataManager):
 
     def add_player():
         pass
+
+
+class ViewManager():
+    
+    route_map: Dict 
+
+    def router(self,route):
+        self.route_map[route].render()

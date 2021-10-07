@@ -17,7 +17,7 @@ class ContentLoader:
         option_list = []
         if data_to_assemble == 'player':
             for player in self.view_app_data['players']:
-                option_list.append({'text': f"{player.id}. {player.first_name} {player.last_name}", "route": '/player/edit'})
+                option_list.append({'text': f"{player._id}. {player.first_name} {player.last_name}", "route": '/player/edit'})
         else:
             for tournament in self.view_app_data['tournaments']:
                 option_list.append(f"{tournament.id}. {tournament.venue}")  
@@ -40,14 +40,14 @@ class View(ABC):
     prompt: str
     _view_manager: any
  
-    def __init__(self, content_loader: ContentLoader,key) -> None:
+    def __init__(self, view_manager, content_loader: ContentLoader,key) -> None:
         super().__init__()
         # attributes have to be initialized here since get_own_attributes cannot list uninitialized attributes (dir() does not offer the possibility)
         self.title = ''
         self.info = []
         self.main = []
         self.prompt = ''
-        self._view_manager = ViewManager()
+        self._view_manager = view_manager
         content_loader.load_content(self, key)
 
     def get_own_attributes(self):
@@ -119,12 +119,3 @@ class Menu(View):
         return to_submit
 
 
-class ViewManager():
-    
-    route_map: Dict 
-
-    def __init__(self) -> None:
-        self.route_map = {'/player': Menu(ContentLoader(), 'PLAYER_MENU')}
-
-    def router(self,route):
-        self.map[route].render()
