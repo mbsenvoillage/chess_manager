@@ -75,7 +75,6 @@ class View(ABC):
     def display_info(self):
         pass
         
-    #[TODO] a different implementation of this method should be given for menus displaying dynamic list of options
     @abstractmethod
     def display_main(self):
         print('\n')
