@@ -1,7 +1,7 @@
 from typing import Dict
 from abc import ABC
 import validator
-from view import ContentLoader, Menu
+
 
 class DataManager(ABC):
 
@@ -24,10 +24,13 @@ class PlayerManager(DataManager):
 
 class ViewManager():
     
-    route_map: Dict 
+    route_map: Dict = {}
 
     def router(self,route):
         if route == '/exit':
             self.route_map[route]()
         else:
             self.route_map[route].render()
+    
+    def add_route(self, route, view):
+        self.route_map[route] = view

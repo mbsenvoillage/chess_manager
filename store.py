@@ -8,7 +8,7 @@ player2 = Player(first_name='Peter', last_name='Callum', birthdate='1970-11-09',
 player3 = Player(first_name='Leila', last_name='Erviti', birthdate='1998-03-09', ranking=2890, gender='F')
 
 
-view_data = {
+static_view_content = {
     'MAIN_MENU': {
         'title': 'Welcome to ChessManager 1.0',
         'info': ['Welcome to Chess Manager, your companion to successful chess tournament management.', 'Pick an option from the list below and press enter.'],

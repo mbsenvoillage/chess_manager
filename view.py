@@ -1,46 +1,80 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
-from store import view_data, app_data
+from manager import ViewManager
+from store import static_view_content, app_data
 import os
-class ContentLoader:
-    """Loads view content from data store"""
-    view_text_content: Dict = view_data
-    view_app_data: Dict = app_data
-    data_to_assemble: str
+import re
 
-    def __init__(self, data_to_assemble=None) -> None:
-        self.data_to_assemble = data_to_assemble
+class SelectableViewOptionBuilder():
+    template: str
+    store_data_key: str
+    base_route: str
+    displayables: List = []
 
- 
-    def assemble_option_list(self, data_to_assemble):
-        option_list = []
-        if data_to_assemble == 'player':
-            for player in self.view_app_data['players']:
-                option_list.append({'text': f"{player._id}. {player.first_name} {player.last_name}", "route": '/player/edit'})
-        else:
-            for tournament in self.view_app_data['tournaments']:
-                option_list.append(f"{tournament.id}. {tournament.venue}")  
-        return option_list
+    def __init__(self, template, store_data_key, base_route) -> None:
+        self.template = template
+        self.store_data_key = store_data_key
+        self.base_route = base_route
+        self.app_data_to_displayable_text()
+
+    def app_data_to_displayable_text(self):
+        """Formats content with template from data store to transform it into displayable text"""
+        object_attributes = list(filter(None, re.split('\W+', self.template)))
+        for item in app_data[self.store_data_key]:
+            template_variables = {a: getattr(item, a) for a in object_attributes}
+            self.displayables.append(self.template.format(**template_variables))
+        return
+        
+    def build_view_options(self):
+        """Builds view options"""
+        view_options = []
+        for option in self.displayables:
+            view_options.append(ViewOption(option, self.base_route).make_option_dict())
+        return view_options
+            
+
+class ViewContentLoader:
+    """Loads content from data store into instance of view"""
+    static_content: Dict = static_view_content
+    app_data: Dict = app_data
+    
+    def plug_option_builder(self, builder, view_entry_to_populate):
+        self.__setattr__('option_builder', builder)
+        self.__setattr__('view_entry_to_populate', view_entry_to_populate)
+        return self
+
+    def unplug_option_builder(self):
+        self.__delattr__('option_builder')
+        self.__delattr__('view_entry_to_populate')
 
     def load_content(self, view, key: str):
         for attr in view.get_own_attributes():
-                setattr(view, attr, self.view_text_content[key][attr])
-        if self.data_to_assemble is not None:
-            setattr(view, 'main', self.assemble_option_list(self.data_to_assemble))
+                setattr(view, attr, self.static_content[key][attr])
+        if hasattr(self, 'option_builder'):
+            setattr(view, self.view_entry_to_populate, self.option_builder.build_view_options())
+            self.unplug_option_builder()
         return 
-       
+
+@dataclass
+class ViewOption(ABC):
+    text: str
+    route: str
+
+    def make_option_dict(self):
+        """Returns key/value representation of class where each class attribute is a key"""
+        return self.__dict__
 
 @dataclass
 class View(ABC):
     """View parent class"""
     title: str 
     info: List[str] 
-    main: List 
+    main: List[ViewOption]
     prompt: str
-    _view_manager: any
+    _view_manager: ViewManager
  
-    def __init__(self, view_manager, content_loader: ContentLoader,key) -> None:
+    def __init__(self, view_manager: ViewManager, content_loader: ViewContentLoader, key: str) -> None:
         super().__init__()
         # attributes have to be initialized here since get_own_attributes cannot list uninitialized attributes (dir() does not offer the possibility)
         self.title = ''
@@ -121,3 +155,4 @@ class Menu(View):
         return to_submit
 
 
+print({} == None)
