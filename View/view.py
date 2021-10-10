@@ -1,8 +1,19 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+import sys
 from typing import List
-from manager import ViewManager
+from content_formatter import view_selectable_options_formatter, view_info_formatter
+from dotenv import load_dotenv
 import os
+
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
+from manager import ViewManager
+
+load_dotenv()
+page_layout= os.getenv('PAGE_LAYOUT')
 
 @dataclass
 class ViewOption(ABC):
@@ -20,18 +31,16 @@ class View(ABC):
     title: str 
     info: List[str] 
     selectable_options: List[ViewOption]
-    prompt: str
     _view_manager: ViewManager
  
-    def __init__(self, view_manager, content_loader, key: str) -> None:
+    def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str) -> None:
         super().__init__()
         # attributes have to be initialized here since get_own_attributes cannot list uninitialized attributes (dir() does not offer the possibility)
         self.title = ''
         self.info = []
         self.selectable_options = []
-        self.prompt = ''
         self._view_manager = view_manager
-        content_loader.load_content(self, key)
+        content_loader.load_content(self, key_of_view_to_be_loaded_from_store)
 
     def get_own_attributes(self):
         """Lists attributes of the view instance"""
@@ -47,26 +56,16 @@ class View(ABC):
         """Submits user input to manager"""
         pass
 
+    @abstractmethod 
     def capture_input():
         pass
 
-    @abstractmethod
-    def display_title(self):
-        print('\n \n \t \t' + self.title)
-
-    @abstractmethod
-    def display_info(self):
-        pass
+    def format_info(self, format_helper_func):
+        return format_helper_func(self.info)
         
-    @abstractmethod
-    def display_selectable_options(self):
-        print('\n')
-        for item in self.selectable_options:
-            print(item['text'])
+    def format_selectable_options(self, format_helper_func):
+        return format_helper_func(self.selectable_options)
     
-    @abstractmethod
-    def display_prompt(self):
-        return '\n' + self.prompt + ' '
 
 
 class Menu(View):
@@ -76,27 +75,13 @@ class Menu(View):
 
     def render(self):
         os.system('cls' if os.name == 'nt' else 'reset')
-        self.display_title()
-        self.display_info()
-        self.display_selectable_options()
-        self.submit(self.capture_input(self.display_prompt()))
-
-    def display_title(self):
-        return super().display_title()
-
-    def display_info(self):
-        print('\n')
-        for item in self.info:
-            print(item)
-    
-    def display_selectable_options(self):
-        return super().display_selectable_options()
-
-    def display_prompt(self):
-        return super().display_prompt()
-    
-    def capture_input(self, prompt):
-        selected_option = input(prompt)
+        formatted_info = self.format_info(view_info_formatter)
+        formatted_options = self.format_selectable_options(view_selectable_options_formatter)
+        print(page_layout.format(self.title, formatted_info, formatted_options))    
+        self.submit(self.capture_input())
+  
+    def capture_input(self):
+        selected_option = input()
         if selected_option == 'q':
             self._view_manager.router('/')
         else:
