@@ -1,19 +1,15 @@
-from dataclasses import dataclass, field
+from dataclasses import field, dataclass
+from pydantic import PrivateAttr
 from abc import ABC, abstractmethod
 import sys
 from typing import List
-from content_formatter import view_selectable_options_formatter, view_info_formatter
+from View.content_formatter import view_selectable_options_formatter, view_info_formatter
 from dotenv import load_dotenv
 import os
-
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
 from manager import ViewManager
 
 load_dotenv()
-page_layout= os.getenv('PAGE_LAYOUT')
+
 
 @dataclass
 class ViewOption(ABC):
@@ -32,6 +28,7 @@ class View(ABC):
     info: List[str] 
     selectable_options: List[ViewOption]
     _view_manager: ViewManager
+    _page_layout: str = field(default=os.getenv('PAGE_LAYOUT'))
  
     def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str) -> None:
         super().__init__()
@@ -77,7 +74,7 @@ class Menu(View):
         os.system('cls' if os.name == 'nt' else 'reset')
         formatted_info = self.format_info(view_info_formatter)
         formatted_options = self.format_selectable_options(view_selectable_options_formatter)
-        print(page_layout.format(self.title, formatted_info, formatted_options))    
+        print(self._page_layout.format(self.title, formatted_info, formatted_options))    
         self.submit(self.capture_input())
   
     def capture_input(self):
