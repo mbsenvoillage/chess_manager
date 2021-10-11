@@ -1,6 +1,10 @@
 from typing import Dict
 from abc import ABC
 import validator
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class DataManager(ABC):
@@ -31,6 +35,13 @@ class ViewManager():
             self.route_map[route]()
         else:
             self.route_map[route].render()
+    
+    def parseInput(self,selectable_options, userInput):
+        quit = os.getenv('QUIT_COMMAND')
+        if userInput == quit:
+            self.router('/')
+        else:
+            self.router(selectable_options[int(userInput) - 1]['route'])
     
     def add_route(self, route, view):
         self.route_map[route] = view

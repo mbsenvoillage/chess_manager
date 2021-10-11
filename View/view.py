@@ -10,7 +10,6 @@ from manager import ViewManager
 
 load_dotenv()
 
-
 @dataclass
 class ViewOption(ABC):
     text: str
@@ -19,7 +18,6 @@ class ViewOption(ABC):
     def represent_self_as_dict(self):
         """Returns key/value representation of class where each class attribute is a key"""
         return self.__dict__
-
 
 @dataclass
 class View(ABC):
@@ -53,34 +51,22 @@ class View(ABC):
         """Submits user input to manager"""
         pass
 
-    @abstractmethod 
-    def capture_input():
-        pass
-
     def format_info(self, format_helper_func):
         return format_helper_func(self.info)
         
     def format_selectable_options(self, format_helper_func):
         return format_helper_func(self.selectable_options)
     
-
-
 class Menu(View):
     
-    def submit(self, route):
-            self._view_manager.router(route)
+    def submit(self, userInput):
+            self._view_manager.parseInput(userInput)
 
     def render(self):
         os.system('cls' if os.name == 'nt' else 'reset')
         formatted_info = self.format_info(view_info_formatter)
         formatted_options = self.format_selectable_options(view_selectable_options_formatter)
         print(self._page_layout.format(self.title, formatted_info, formatted_options))    
-        self.submit(self.capture_input())
+        userInput = input()
+        self.submit(userInput)
   
-    def capture_input(self):
-        selected_option = input()
-        if selected_option == 'q':
-            self._view_manager.router('/')
-        else:
-            to_submit = self.selectable_options[int(selected_option) - 1]['route']
-        return to_submit
