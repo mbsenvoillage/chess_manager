@@ -17,10 +17,7 @@ class ViewSelectableOptionBuilder():
         self.app_data_to_displayable_text()
         
 
-    # def build_format_config(instance_of_class, attributes):
-    #     return {attribute: getattr(instance_of_class, attribute) for attribute in attributes}
-
-    def build_format_configuration(self, instance_of_class, attributes):
+    def format_func_argument_builder(self, instance_of_class, attributes):
         return {attribute: getattr(instance_of_class, attribute) for attribute in attributes}
 
     def app_data_to_displayable_text(self):
@@ -28,7 +25,7 @@ class ViewSelectableOptionBuilder():
         object_attributes_to_be_fetched = self.extract_object_attributes_from_template()
         object_store = app_data[self.store_data_key]
         for instance in object_store:
-            format_config = self.build_format_configuration(instance, object_attributes_to_be_fetched)
+            format_config = self.format_func_argument_builder(instance, object_attributes_to_be_fetched)
             self.displayables.append(self.string_template.format(**format_config))
         return
 

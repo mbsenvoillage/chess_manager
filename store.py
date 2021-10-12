@@ -31,7 +31,7 @@ static_view_content = {
     },
     'PLAYER_CREATE': {
         'title': 'Add New Player',
-        'info': 'All form fields must be filled in order to add the new player to the database',
+        'info': ['All form fields must be filled in order to add the new player to the database'],
         'form_fields': ["Player's first name : ", "Player's last name : ", "Player's date of birth (yyyy-mm-dd) : ", "Player's gender (M/F) : ", "Player's ranking : "]
     }
 }

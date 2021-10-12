@@ -9,3 +9,9 @@ def view_info_formatter(pieces_of_info):
     for info in pieces_of_info:
         formatted_text += info + '\n'
     return formatted_text
+
+def view_form_fields_formatted(form_fields):
+    formatted_fields = ''
+    for field in form_fields:
+        formatted_fields += field + '\n'
+    return formatted_fields

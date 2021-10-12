@@ -1,5 +1,5 @@
 import os
-from View.view import Menu
+from View.view import Form, Menu
 from View.content_loader import ViewContentLoader
 from View.option_builder import ViewSelectableOptionBuilder
 
@@ -13,6 +13,7 @@ view_manager = manager.ViewManager()
 content_loader = ViewContentLoader()
 main_menu = Menu(view_manager, content_loader, 'MAIN_MENU')
 player_menu = Menu(view_manager, content_loader, 'PLAYER_MENU')
+player_create = Form(view_manager, content_loader, 'PLAYER_CREATE')
 
 # edit_player_menu_selectable_options_builder = ViewSelectableOptionBuilder('{_id}. {first_name} {last_name}', 'players', '/player/edit/someone')
 # edit_player_menu = Menu(view_manager, content_loader.plug_selectable_option_builder(edit_player_menu_selectable_options_builder), 'PLAYER_EDIT')
@@ -24,4 +25,4 @@ player_menu = Menu(view_manager, content_loader, 'PLAYER_MENU')
 # view_manager.add_route('/exit', quit_app)
 
 
-main_menu.render()
+player_create.render()
