@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from datetime import time
 from typing import List
 from dotenv import load_dotenv
 import os
-from manager import ViewManager
+from manager import DataManager, ViewManager
+from store import app_data
+import time
 
 load_dotenv()
 
@@ -39,12 +42,6 @@ def view_info_formatter(pieces_of_info):
         formatted_text += info + '\n'
     return formatted_text
 
-def view_form_fields_formatter(form_fields):
-    formatted_fields = ''
-    for field in form_fields:
-        formatted_fields += field + '\n'
-    return formatted_fields
-
 @dataclass
 class View(ABC):
     """View parent class"""
@@ -78,7 +75,6 @@ class View(ABC):
     def format_info(self, format_helper_func):
         return format_helper_func(self.info)
         
-    
 class Menu(View):
 
     selectable_options: List[ViewOption]
@@ -106,31 +102,36 @@ class Menu(View):
         selected_option = input()
         self.submit(selected_option)
 
-
-
     
 class Form(View):
 
     form_fields: List[FormField]
+    _data_manager: DataManager
 
-    def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str) -> None:
+    def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str, data_manager) -> None:
         super().__init__(view_manager)
         self._page_layout = get_page_layout(self)
         self.form_fields = []
+        self._data_manager = data_manager
         content_loader.load_content(self, key_of_view_to_be_loaded_from_store)
-
-    def format_form_fields(self, format_helper_func):
-        return format_helper_func(self.form_fields)
-
-    def get_input_data_manager_validator_key(self, ):
-        pass
 
     def capture_form_inputs(self):
         inputs = []
         for field in self.form_fields:
-            userInput = input(field)
+            userInput = input(field['text'])
+            userInputIsValid = self._data_manager.validate(userInput, field['class_attribute'])
+            while not userInputIsValid:
+                print("Submitted data is incorrect. Please enter valid data.")
+                userInput = input(field['text'])
+                userInputIsValid = self._data_manager.validate(userInput, field['class_attribute'])
             inputs.append(userInput)
-        print(inputs)
+        player_is_to_be_added = input('Do you want to add the player to the database ? (answer by yes or no)')
+        if player_is_to_be_added == 'yes':
+            self._data_manager.add(inputs)
+        print(app_data['players'])
+        time.sleep(2)
+        self._view_manager.router('/')
+        
 
     def render(self):
         super().render()
