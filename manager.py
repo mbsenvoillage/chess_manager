@@ -1,8 +1,10 @@
-from typing import Dict
+from typing import Dict, List
 from abc import ABC
 import validator
 import os
 from dotenv import load_dotenv
+
+
 
 load_dotenv()
 
@@ -36,12 +38,13 @@ class ViewManager():
         else:
             self.route_map[route].render()
     
-    def parseInput(self,selectable_options, userInput):
+    def selected_option_to_route(self, selectable_options, selected_option):
         quit = os.getenv('QUIT_COMMAND')
-        if userInput == quit:
+        print(selected_option)
+        if selected_option == quit:
             self.router('/')
         else:
-            self.router(selectable_options[int(userInput) - 1]['route'])
+            self.router(selectable_options[int(selected_option) - 1]['route'])
     
     def add_route(self, route, view):
         self.route_map[route] = view

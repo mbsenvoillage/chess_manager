@@ -1,20 +1,11 @@
-from dataclasses import field, dataclass
-from pydantic import PrivateAttr
+from dataclasses import dataclass
 from abc import ABC, abstractmethod
-import sys
 from typing import List
-from View.content_formatter import view_selectable_options_formatter, view_info_formatter, view_form_fields_formatted
 from dotenv import load_dotenv
 import os
 from manager import ViewManager
 
 load_dotenv()
-
-def get_page_layout(view):
-    page_layout = os.getenv('DEFAULT_PAGE_LAYOUT')
-    if isinstance(view, Form):
-        page_layout = os.getenv('FORM_PAGE_LAYOUT')
-    return page_layout
 
 @dataclass
 class ViewOption(ABC):
@@ -24,6 +15,35 @@ class ViewOption(ABC):
     def represent_self_as_dict(self):
         """Returns key/value representation of class where each class attribute is a key"""
         return self.__dict__
+
+@dataclass
+class FormField(ABC):
+    text: str
+    class_attribute: str
+
+def get_page_layout(view):
+    page_layout = os.getenv('DEFAULT_PAGE_LAYOUT')
+    if isinstance(view, Form):
+        page_layout = os.getenv('FORM_PAGE_LAYOUT')
+    return page_layout
+
+def view_selectable_options_formatter(options: List[ViewOption]):
+    formatted_text = ''
+    for option in options:
+        formatted_text += option['text'] + '\n'
+    return formatted_text
+
+def view_info_formatter(pieces_of_info):
+    formatted_text = ''
+    for info in pieces_of_info:
+        formatted_text += info + '\n'
+    return formatted_text
+
+def view_form_fields_formatter(form_fields):
+    formatted_fields = ''
+    for field in form_fields:
+        formatted_fields += field + '\n'
+    return formatted_fields
 
 @dataclass
 class View(ABC):
@@ -68,27 +88,30 @@ class Menu(View):
         self.selectable_options = []
         self._page_layout = get_page_layout(self)
         content_loader.load_content(self, key_of_view_to_be_loaded_from_store)
-
-    def render(self):
-        super().render()
-        formatted_info = self.format_info(view_info_formatter)
-        formatted_options = self.format_selectable_options(view_selectable_options_formatter)
-        print(self._page_layout.format(self.title, formatted_info, formatted_options))    
-        userInput = input()
-        self.submit(userInput)
-
-    
-    def submit(self, userInput):
-            self._view_manager.parseInput(userInput)
+        
+    def submit(self, selected_option):
+            self._view_manager.selected_option_to_route(self.selectable_options,selected_option)
 
     def format_selectable_options(self, format_helper_func):
         return format_helper_func(self.selectable_options)
 
-    
+    def assembleDisplayableElements(self):
+        formatted_info = self.format_info(view_info_formatter)
+        formatted_options = self.format_selectable_options(view_selectable_options_formatter)
+        return [self.title, formatted_info, formatted_options]
 
+    def render(self):
+        super().render()
+        print(self._page_layout.format(*self.assembleDisplayableElements()))    
+        selected_option = input()
+        self.submit(selected_option)
+
+
+
+    
 class Form(View):
 
-    form_fields: List[ViewOption]
+    form_fields: List[FormField]
 
     def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str) -> None:
         super().__init__(view_manager)
@@ -100,6 +123,9 @@ class Form(View):
     def format_form_fields(self, format_helper_func):
         return format_helper_func(self.form_fields)
 
+    def get_input_data_manager_validator_key(self, ):
+        pass
+
     def capture_form_inputs(self):
         inputs = []
         for field in self.form_fields:
@@ -110,7 +136,6 @@ class Form(View):
     def render(self):
         super().render()
         formatted_info = self.format_info(view_info_formatter)
-        form_fields = self.format_form_fields(view_form_fields_formatted)
         print(self._page_layout.format(self.title, formatted_info))    
         self.capture_form_inputs()
     

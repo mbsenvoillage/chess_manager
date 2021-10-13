@@ -32,7 +32,7 @@ static_view_content = {
     'PLAYER_CREATE': {
         'title': 'Add New Player',
         'info': ['All form fields must be filled in order to add the new player to the database'],
-        'form_fields': ["Player's first name : ", "Player's last name : ", "Player's date of birth (yyyy-mm-dd) : ", "Player's gender (M/F) : ", "Player's ranking : "]
+        'form_fields': [{"text": "Player's first name : ", "class_attribute": "first_name"}, {"text": "Player's last name : ", "class_attribute": "last_name"}, {"text":"Player's date of birth (yyyy-mm-dd) : ", "class_attribute": "birthdate"}, {"text": "Player's gender (M/F) : ", "class_attribute": "gender"}, {"text": "Player's ranking : ", "class_attribute": "ranking"}]
     }
 }
 
