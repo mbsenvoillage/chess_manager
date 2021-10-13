@@ -115,7 +115,6 @@ class Form(View):
 
     def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str) -> None:
         super().__init__(view_manager)
-        #FORM_PAGE_LAYOUT="\n \n{0} \n \n \n{1} \n \n \n"
         self._page_layout = get_page_layout(self)
         self.form_fields = []
         content_loader.load_content(self, key_of_view_to_be_loaded_from_store)

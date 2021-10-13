@@ -1,0 +1,4 @@
+KEY_FOR_DYNAMIC_VIEW_DATA=selectable_options
+DEFAULT_PAGE_LAYOUT="\n \n{0} \n \n \n{1} \n \n \n{2} \n"
+FORM_PAGE_LAYOUT="\n \n{0} \n \n \n{1} \n"
+QUIT_COMMAND=q
