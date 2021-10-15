@@ -25,22 +25,7 @@ class FormField(ABC):
     class_attribute: str
 
 def get_page_layout(view):
-    page_layout = os.getenv('DEFAULT_PAGE_LAYOUT')
-    if isinstance(view, Form):
-        page_layout = os.getenv('FORM_PAGE_LAYOUT')
-    return page_layout
-
-def view_selectable_options_formatter(options: List[ViewOption]):
-    formatted_text = ''
-    for option in options:
-        formatted_text += option['text'] + '\n'
-    return formatted_text
-
-def view_info_formatter(pieces_of_info):
-    formatted_text = ''
-    for info in pieces_of_info:
-        formatted_text += info + '\n'
-    return formatted_text
+    return os.getenv('FORM_PAGE_LAYOUT') if isinstance(view, Form) else os.getenv('DEFAULT_PAGE_LAYOUT')
 
 @dataclass
 class View(ABC):
@@ -71,41 +56,42 @@ class View(ABC):
     def submit():
         """Submits user input to manager"""
         pass
-
-    def format_info(self, format_helper_func):
-        return format_helper_func(self.info)
         
 class Menu(View):
 
-    selectable_options: List[ViewOption]
+    options: List[tuple[str, str]]
 
-    def __init__(self, view_manager, content_loader, key_of_view_to_be_loaded_from_store: str) -> None:
+    def __init__(self, view_manager, title, info, options) -> None:
         super().__init__(view_manager)
-        self.selectable_options = []
+        self.title = title
+        self.info = info
+        self.options = options
         self._page_layout = get_page_layout(self)
-        content_loader.load_content(self, key_of_view_to_be_loaded_from_store)
-        
+
     def submit(self, selected_option):
         if selected_option == os.getenv('QUIT_COMMAND'):
             self._view_manager.router(os.getenv('QUIT_REDIRECTION_ROUTE'))
         else:
-            self._view_manager.router(self.selectable_options[int(selected_option) - 1].route)
-
-    def format_selectable_options(self, format_helper_func):
-        return format_helper_func(self.selectable_options)
-
-    def assembleDisplayableElements(self):
-        formatted_info = self.format_info(view_info_formatter)
-        formatted_options = self.format_selectable_options(view_selectable_options_formatter)
-        return [self.title, formatted_info, formatted_options]
-
+            self._view_manager.router(self.options[int(selected_option) - 1][1])
+    
     def render(self):
         super().render()
-        print(self._page_layout.format(*self.assembleDisplayableElements()))    
-        selected_option = input()
-        self.submit(selected_option)
+        print(self.format_view_content())    
+        self.handle_user_input()
+         
+    def handle_user_input(self):
+        self.submit(input())
 
-    
+    def format_view_content(self) -> str:
+        info = self.get_string_repr(self.info)
+        options = self.get_string_repr([option[0] for option in self.options])
+        return self._page_layout.format(self.title, info, options)
+
+    def get_string_repr(self,elements_to_display: List[str]):
+        return "\n".join(elements_to_display)
+
+  
+
 class Form(View):
 
     form_fields: List[FormField]
