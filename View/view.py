@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from datetime import time
 from typing import List
@@ -86,7 +86,10 @@ class Menu(View):
         content_loader.load_content(self, key_of_view_to_be_loaded_from_store)
         
     def submit(self, selected_option):
-            self._view_manager.selected_option_to_route(self.selectable_options,selected_option)
+        if selected_option == os.getenv('QUIT_COMMAND'):
+            self._view_manager.router(os.getenv('QUIT_REDIRECTION_ROUTE'))
+        else:
+            self._view_manager.router(self.selectable_options[int(selected_option) - 1].route)
 
     def format_selectable_options(self, format_helper_func):
         return format_helper_func(self.selectable_options)

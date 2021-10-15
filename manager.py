@@ -47,14 +47,6 @@ class ViewManager():
             self.route_map[route]()
         else:
             self.route_map[route].render()
-    
-    def selected_option_to_route(self, selectable_options, selected_option):
-        quit = os.getenv('QUIT_COMMAND')
-        print(selected_option)
-        if selected_option == quit:
-            self.router('/')
-        else:
-            self.router(selectable_options[int(selected_option) - 1]['route'])
-    
+      
     def add_route(self, route, view):
         self.route_map[route] = view
