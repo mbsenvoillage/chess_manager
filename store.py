@@ -16,22 +16,21 @@ static_view_content = {
     'PLAYER_MENU': {
         'title': 'Player Menu',
         'info': ['Create a new player, or edit an existing one.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options': [{'text': '1. Create Player', 'route': '/player/create'}, {'text' : '2. Edit Player', 'route': '/player/edit'}],
+        'options': [('1. Create Player', '/player/create'), ('2. Edit Player', '/player/edit')],
     },
     'PLAYER_EDIT': {
         'title': 'Edit Players',
         'info': ['Select a player to edit any data from its profile, like ranking.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options':[],
     },
     'TOURNAMENT_MENU': {
         'title': 'Tournament Menu',
         'info': ['Create a new tournament, or edit an existing one.','Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options': [{'text': '1. Create Tournament', 'route': '/tournament/create'}, {'text' : '2. Edit Tournament', 'route': '/tournament/edit'}],
+        'options': [('1. Create Tournament', '/tournament/create'), ('2. Edit Tournament', '/tournament/edit')],
     },
     'PLAYER_CREATE': {
         'title': 'Add New Player',
         'info': ['All form fields must be filled in order to add the new player to the database'],
-        'form_fields': [{"text": "Player's first name : ", "class_attribute": "first_name"}, {"text": "Player's last name : ", "class_attribute": "last_name"}, {"text":"Player's date of birth (yyyy-mm-dd) : ", "class_attribute": "birthdate"}, {"text": "Player's gender (M/F) : ", "class_attribute": "gender"}, {"text": "Player's ranking : ", "class_attribute": "ranking"}]
+        'form_fields': [("Player's first name : ", "first_name"), ("Player's last name : ", "last_name"), ("Player's date of birth (yyyy-mm-dd) : ", "birthdate"), ("Player's gender (M/F) : ", "gender"), ("Player's ranking : ", "ranking")]
     }
 }
 
