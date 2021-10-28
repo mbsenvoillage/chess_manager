@@ -4,6 +4,9 @@ from pydantic.fields import PrivateAttr
 from pydantic.types import constr
 from enums import Gender
 from dateutil.relativedelta import relativedelta
+import names
+import random
+import uuid
 
     # [TODO] first name must not contain more than 25 letters and less than 2
     # may contain spaces, accents, dashes
@@ -27,4 +30,36 @@ class Player(BaseModel):
 
     def __repr__(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def get_info(self):
+        return f"{self.ranking} - {self.first_name} {self.last_name}"
 
+# for i in range(10):
+#     print(names.get_full_name())
+
+def gen_birthdate():
+    return f"{random.randint(1940,1990)}-{random.randint(1,12)}-{random.randint(1,28)}"
+
+def gen_gender():
+    return ['M', 'F'][random.randint(0,1)]
+
+def gen_id():
+    return str(uuid.uuid4())
+
+def gen_ranking():
+    return random.randint(1000,3000)
+
+def gen_player():
+    return Player(id=gen_id(), first_name=names.get_first_name(), last_name=names.get_last_name(), birthdate=gen_birthdate(), ranking=gen_ranking(), gender=gen_gender())
+
+def gen_list_of_players(number):
+    return [gen_player() for i in range(int(number))]
+
+
+
+
+# players = gen_list_of_players(8)
+# players.sort(key=lambda player: player.ranking, reverse=True)
+
+# for player in players:
+#     print(player.get_info())‡
