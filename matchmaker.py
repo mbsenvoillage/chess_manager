@@ -2,7 +2,7 @@ import copy
 from os import name
 from typing import Dict, List
 from player import Player, gen_list_of_players
-from tournament import Match, Round, generate_round_results
+from tournament import Match, Round, Tournament, generate_round_results
 
 
 def split_list(a_list):
@@ -50,27 +50,41 @@ def update_leader_board(leaderboard, round: Round):
         copyOfLeaderboard[match.player_two.id][1] += 1 - match.player_one_result
         copyOfLeaderboard[match.player_two.id][2].add(match.player_one.id)
     return copyOfLeaderboard
-    
+
+def make_round(tournament: Tournament):
+    if len(tournament.rounds) == 0:
+        tournament.players.sort(key=lambda player: player.ranking, reverse=True)
+        round1 = Round(name='Round1', matches=generate_first_round_matches(*split_list(tournament.players)))
+        tournament.rounds.append(round1)
+        return tournament
+    else:
+        for match in tournament.rounds[len(tournament.rounds)-1].matches:
+            if match.player_one_result is None:
+                return 'Cannot generate next round matches until all matches from current round have been played'
+            
+tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(8),time_control='Bullet')
+print(make_round(tournament))
+print(make_round(tournament))
 
 
-players = gen_list_of_players(8)
-leaderboard = init_leader_board(players)
-print(format_leader_board(leaderboard))
-leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][0].ranking, reverse=True))
-print(format_leader_board(leaderboard))
-matches = generate_matches([], players)
-round1 = Round(name='round1',matches=matches)
-round1.repr_matches()
-r1copy = generate_round_results(round1)
-r1copy.repr_matches()
-leaderboard = dict(sorted(update_leader_board(leaderboard, r1copy).items(), key=lambda item: item[1][0].ranking, reverse=True))
-leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
-print(format_leader_board(leaderboard))
-round2_matches = generate_round_matches(leaderboard)
-round2 = Round(name='round2', matches=round2_matches)
-round2.repr_matches()
-r2copy = generate_round_results(round2)
-r2copy.repr_matches()
-leaderboard = dict(sorted(update_leader_board(leaderboard, r2copy).items(), key=lambda item: item[1][0].ranking, reverse=True))
-leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
-print(format_leader_board(leaderboard))
+# players = gen_list_of_players(8)
+# leaderboard = init_leader_board(players)
+# print(format_leader_board(leaderboard))
+# leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][0].ranking, reverse=True))
+# print(format_leader_board(leaderboard))
+# matches = generate_matches([], players)
+# round1 = Round(name='round1',matches=matches)
+# round1.repr_matches()
+# r1copy = generate_round_results(round1)
+# r1copy.repr_matches()
+# leaderboard = dict(sorted(update_leader_board(leaderboard, r1copy).items(), key=lambda item: item[1][0].ranking, reverse=True))
+# leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
+# print(format_leader_board(leaderboard))
+# round2_matches = generate_round_matches(leaderboard)
+# round2 = Round(name='round2', matches=round2_matches)
+# round2.repr_matches()
+# r2copy = generate_round_results(round2)
+# r2copy.repr_matches()
+# leaderboard = dict(sorted(update_leader_board(leaderboard, r2copy).items(), key=lambda item: item[1][0].ranking, reverse=True))
+# leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
+# print(format_leader_board(leaderboard))
