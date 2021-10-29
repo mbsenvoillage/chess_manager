@@ -58,13 +58,22 @@ def make_round(tournament: Tournament):
         tournament.rounds.append(round1)
         return tournament
     else:
+        if len(tournament.rounds) == tournament.number_of_rounds:
+            raise ValueError('Tournament has reached maximum number of rounds') 
         for match in tournament.rounds[len(tournament.rounds)-1].matches:
             if match.player_one_result is None:
-                return 'Cannot generate next round matches until all matches from current round have been played'
+                raise ValueError('Cannot generate next round matches until all matches from current round have been played') 
+        leaderboard = init_leader_board(tournament.players)
+        for round in tournament.rounds:
+            leaderboard = dict(sorted(update_leader_board(leaderboard, round).items(), key=lambda item: item[1][0].ranking, reverse=True))
+            leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
+        new_round = Round(name=f"Round{len(tournament.rounds)}", matches=generate_round_matches(leaderboard))
+        tournament.rounds.append(new_round)
+        return tournament
             
 tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(8),time_control='Bullet')
 print(make_round(tournament))
-print(make_round(tournament))
+# print(make_round(tournament))
 
 
 # players = gen_list_of_players(8)
