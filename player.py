@@ -34,8 +34,6 @@ class Player(BaseModel):
     def get_info(self):
         return f"{self.ranking} - {self.first_name} {self.last_name}"
 
-# for i in range(10):
-#     print(names.get_full_name())
 
 def gen_birthdate():
     return f"{random.randint(1940,1990)}-{random.randint(1,12)}-{random.randint(1,28)}"

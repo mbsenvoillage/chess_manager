@@ -1,9 +1,13 @@
+from os import name
 import random
 from typing import List, Optional
+from uuid import uuid4
+import uuid
 from pydantic import BaseModel, validator, PositiveInt
 from datetime import date
 import copy
-from player import Player, gen_player
+from enums import TimeControl
+from player import Player, gen_list_of_players, gen_player
 
 class Match(BaseModel):
     player_one: Player
@@ -25,3 +29,28 @@ def generate_round_results(round: Round):
     for match in copyOfRound.matches:
         match.player_one_result =[0,0.5,1][random.randint(0,2)]
     return copyOfRound
+
+class Tournament(BaseModel):
+    id: str = str(uuid.uuid4())
+    name: str
+    venue: str
+    start_date: Optional[date]
+    end_date: Optional[date]
+    number_of_rounds: int = 0
+    rounds: list[Round]
+    players: list[Player]
+    time_control: TimeControl
+    comments: str = ''
+
+    def __init__(self, **data) -> None:
+        super().__init__(**data)
+        self.number_of_rounds = len(self.players) - 1
+ 
+    @validator('players')
+    def is_number_of_players_sufficient(cls, value):
+        if len(value) < 8:
+            raise ValueError('There should be at least eight participants for the tournament')
+        return value
+
+# tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(8),time_control='Bullet')
+# print(tournament)
