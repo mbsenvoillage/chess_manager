@@ -5,7 +5,6 @@ import json
 from player import Player
 import validator
 from dotenv import load_dotenv
-from store import app_data
 from database import db, players
 import uuid
 from tinydb import where
@@ -30,6 +29,14 @@ class DataManager(ABC):
     def update(self, data, id):
         pass
 
+    @abstractmethod
+    def get_all(self):
+        pass
+
+    @abstractmethod
+    def get_by_id(self, id):
+        pass
+
 class PlayerManager(DataManager):
 
     validators = validator.player_validators
@@ -40,65 +47,61 @@ class PlayerManager(DataManager):
         new_player = Player(id=id, first_name=data[0], last_name=data[1], birthdate=data[2], gender=data[3], ranking=data[4])
         self.player_store.insert(json.loads(new_player.json()))
     
-    def get_all_players(self) -> List[Player]:
+    def get_all(self) -> List[Player]:
         return [Player(**playerdata) for playerdata in players.all()]
 
-    def make_option_list(self):
+    def make_option_list(self,option_base_route):
         option_list = []
-        for index, player in enumerate(self.get_all_players()):
-            option_list.append([f"{index+1}. {player.first_name} {player.last_name}", f"/player/edit?id={player.id}"])
+        for index, player in enumerate(self.get_all()):
+            option_list.append([f"{index+1}. {player.first_name} {player.last_name}", f"{option_base_route}{player.id}"])
         return option_list
 
     def update(self, data, player_id):
         self.player_store.update(data, where('id') == player_id)
 
-    def get_player_by_id(self, player_id):
+    def get_by_id(self, player_id):
         return self.player_store.search(where('id') == player_id)[0]
 
 class ViewManager():
-    
-    route_map: Dict = {}
+    views: Dict
 
-    def router(self,route):
-        if route == '/exit':
-            self.route_map[route]()
-        if "?" in route:
-            self
+    def __init__(self, views) -> None:
+        self.views = views
+
+    def get(self,view_name,params=None):
+        if params:
+            data = self.views[view_name]['manager'].get_by_id(params)
+            view = self.views[view_name]['view']()
+            view(data,params).render()
+        elif view_name == 'exit':
+            self.views[view_name]['view']()
         else:
-            self.route_map[route].render()
-      
-    def add_route(self, route, view):
-        self.route_map[route] = view
+            print(self.views[view_name])
+            view = self.views[view_name]['view']()
+            view.render()
 
 
 class Router():
-    route_map: Dict = {}
-    player_manager : PlayerManager
+    view_manager: ViewManager
 
-    def __init__(self, player_manager) -> None:
-        self.player_manager = player_manager
-
-    def __call__(self, routes) -> Any:
-        for route in routes:
-            self.route_map[route['path']] = route['view']
+    def __init__(self, view_manager) -> None:
+        self.view_manager = view_manager
 
     def get_url_param(self, route):
         import re
         if 'player' in route:
             return re.split('/|=|\?',route)[-1]
 
-    def get_base_url(self, route):
-        return re.match("\/[a-z]*\/[a-z]*\?", route).group()
+    def get_view_name_from_route(self, route):
+        return '_'.join(list(filter(bool, re.match("((\/[a-z]*)+)", route).group().split('/'))))
 
     def route(self, route):
-        if route == '/exit':
-            self.route_map[route]()
         if "?" in route:
-            id = self.get_url_param(route)
-            base_url = self.get_base_url(route)
-            data = self.player_manager.get_player_by_id(id)
-            view = self.route_map[base_url]()
-            view(data,id).render()
+            param = self.get_url_param(route)
+            view_name = self.get_view_name_from_route(route)
+            self.view_manager.get(view_name, param)
         else:
-            view =  self.route_map[route]()
-            view.render()
+            view_name = self.get_view_name_from_route(route)
+            self.view_manager.get(view_name)
+
+print('_'.join(list(filter(bool, re.match("((\/[a-z]*)+)", '/home/player/other?id=18').group().split('/')))))

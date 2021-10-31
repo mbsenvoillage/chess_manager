@@ -93,7 +93,7 @@ class Form(View):
         player_is_to_be_added = input('Do you want to add the player to the database ? (answer by yes or no) ')
         if player_is_to_be_added == 'yes':
             self._data_manager.add(inputs)
-        self._router.route('/player/edit')
+        self._router.route('/player')
 
     def format_view_content(self) -> str:
         info = super().get_string_repr(self.info)
@@ -129,4 +129,4 @@ class FormEdit(Form):
         data_is_to_be_edited = input('Do you want to continue with this update ? (answer by yes or no) ')
         if data_is_to_be_edited == 'yes':
             self._data_manager.update(inputs, self.__getattribute__('_data_store_id'))
-        self._router.route('/player/edit')
+        self._router.route('/player/edit/menu')

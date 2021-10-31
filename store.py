@@ -9,7 +9,7 @@ static_view_content = {
     'PLAYER_MENU': {
         'title': 'Player Menu',
         'info': ['Create a new player, or edit an existing one.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options': [['1. Create Player', '/player/create'], ['2. Edit Player', '/player/edit']],
+        'options': [['1. Create Player', '/player/create'], ['2. Edit Player', '/player/edit/menu']],
     },
     'PLAYER_EDIT': {
         'title': 'Edit Players',
