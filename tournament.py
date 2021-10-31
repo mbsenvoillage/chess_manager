@@ -36,15 +36,21 @@ class Tournament(BaseModel):
     venue: str
     start_date: Optional[date]
     end_date: Optional[date]
-    number_of_rounds: int = 0
+    number_of_rounds: int = 4
     rounds: list[Round]
     players: list[Player]
     time_control: TimeControl
     comments: str = ''
+    locked: bool = False
 
     def __init__(self, **data) -> None:
         super().__init__(**data)
-        self.number_of_rounds = len(self.players) - 1
+    
+    @validator('players')
+    def is_number_of_players_even(cls, value):
+        if len(value) % 2 != 0:
+            raise ValueError('Number of participants should be even')
+        return value
  
     @validator('players')
     def is_number_of_players_sufficient(cls, value):
@@ -52,5 +58,5 @@ class Tournament(BaseModel):
             raise ValueError('There should be at least eight participants for the tournament')
         return value
 
-# tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(8),time_control='Bullet')
+# tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(7),time_control='Bullet')
 # print(tournament)

@@ -1,9 +1,8 @@
 import copy
-from os import name
+from os import error, name
 from typing import Dict, List
 from player import Player, gen_list_of_players
 from tournament import Match, Round, Tournament, generate_round_results
-
 
 def split_list(a_list):
     half = len(a_list)//2
@@ -17,8 +16,12 @@ def generate_round_matches(leaderboard):
     player_id_list = list(leaderboard)
     for index, player_id in enumerate(player_id_list):
         next_playable_opponent_index = index + 1
-        while player_id in leaderboard[player_id_list[next_playable_opponent_index]][2]:
-            next_playable_opponent_index += 1
+        try:
+            while player_id in leaderboard[player_id_list[next_playable_opponent_index]][2]:
+                next_playable_opponent_index += 1
+        except IndexError as error:
+            print("Cannot generate this round matches")
+            raise error
         match = Match(player_one=leaderboard[player_id][0], player_two=leaderboard[player_id_list[next_playable_opponent_index]][0])
         list_of_matches.append(match)
         player_id_list.pop(next_playable_opponent_index)
@@ -67,33 +70,27 @@ def make_round(tournament: Tournament):
         for round in tournament.rounds:
             leaderboard = dict(sorted(update_leader_board(leaderboard, round).items(), key=lambda item: item[1][0].ranking, reverse=True))
             leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
-        new_round = Round(name=f"Round{len(tournament.rounds)}", matches=generate_round_matches(leaderboard))
+        try:
+            new_round = Round(name=f"Round{len(tournament.rounds)}", matches=generate_round_matches(leaderboard))
+        except Exception as e:
+            print(e)
+            print("Tournament cannot go on with the current matching system")
+            raise e
         tournament.rounds.append(new_round)
         return tournament
             
 tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(8),time_control='Bullet')
-print(make_round(tournament))
-# print(make_round(tournament))
 
-
-# players = gen_list_of_players(8)
-# leaderboard = init_leader_board(players)
-# print(format_leader_board(leaderboard))
-# leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][0].ranking, reverse=True))
-# print(format_leader_board(leaderboard))
-# matches = generate_matches([], players)
-# round1 = Round(name='round1',matches=matches)
-# round1.repr_matches()
-# r1copy = generate_round_results(round1)
-# r1copy.repr_matches()
-# leaderboard = dict(sorted(update_leader_board(leaderboard, r1copy).items(), key=lambda item: item[1][0].ranking, reverse=True))
-# leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
-# print(format_leader_board(leaderboard))
-# round2_matches = generate_round_matches(leaderboard)
-# round2 = Round(name='round2', matches=round2_matches)
-# round2.repr_matches()
-# r2copy = generate_round_results(round2)
-# r2copy.repr_matches()
-# leaderboard = dict(sorted(update_leader_board(leaderboard, r2copy).items(), key=lambda item: item[1][0].ranking, reverse=True))
-# leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
-# print(format_leader_board(leaderboard))
+leaderboard = init_leader_board(tournament.players)
+print(format_leader_board(leaderboard))
+leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][0].ranking, reverse=True))
+try:
+    for round_idx in range(tournament.number_of_rounds):
+        tournament = make_round(tournament)
+        tournament.rounds[round_idx] = generate_round_results(tournament.rounds[round_idx])
+        tournament.rounds[round_idx].repr_matches()
+        leaderboard = dict(sorted(update_leader_board(leaderboard, tournament.rounds[round_idx]).items(), key=lambda item: item[1][0].ranking, reverse=True))
+        leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1][1], reverse=True))
+        print(format_leader_board(leaderboard))
+except Exception as e:
+    print("Tournament must end now")
