@@ -63,12 +63,13 @@ class PlayerManager(DataManager):
         return self.player_store.search(where('id') == player_id)[0]
 
 class ViewManager():
-    views: Dict
+    views: Dict = {}
 
-    def __init__(self, views) -> None:
+    def __call__(self, views) -> Any:
         self.views = views
+        return self
 
-    def get(self,view_name,params=None):
+    def get_view(self,view_name,params=None):
         if params:
             data = self.views[view_name]['manager'].get_by_id(params)
             view = self.views[view_name]['view']()
@@ -76,9 +77,20 @@ class ViewManager():
         elif view_name == 'exit':
             self.views[view_name]['view']()
         else:
-            print(self.views[view_name])
             view = self.views[view_name]['view']()
             view.render()
+    
+    def send(self,view_name,*data):
+        update_data = len(data) > 1
+        user_input = data[0]
+        if update_data:    
+            id = data[1]
+            self.views[view_name]['manager'].update(user_input,id)
+        else:
+            self.views[view_name]['manager'].add(user_input)
+
+    def validate(self,view_name,user_input,field_type):
+        return self.views[view_name]['manager'].validate(user_input,field_type)
 
 
 class Router():
@@ -99,9 +111,7 @@ class Router():
         if "?" in route:
             param = self.get_url_param(route)
             view_name = self.get_view_name_from_route(route)
-            self.view_manager.get(view_name, param)
+            self.view_manager.get_view(view_name, param)
         else:
             view_name = self.get_view_name_from_route(route)
-            self.view_manager.get(view_name)
-
-print('_'.join(list(filter(bool, re.match("((\/[a-z]*)+)", '/home/player/other?id=18').group().split('/')))))
+            self.view_manager.get_view(view_name)
