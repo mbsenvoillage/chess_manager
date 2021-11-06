@@ -41,7 +41,6 @@ class Tournament(BaseModel):
     players: list[Player]
     time_control: TimeControl
     comments: str = ''
-    locked: bool = False
 
     def __init__(self, **data) -> None:
         super().__init__(**data)
