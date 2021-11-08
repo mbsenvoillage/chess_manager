@@ -3,9 +3,10 @@ from typing import Any, Dict, List
 from abc import ABC, abstractmethod
 import json
 from player import Player
+from tournament import Tournament
 import validator
 from dotenv import load_dotenv
-from database import db, players
+from database import players, tournaments
 import uuid
 from tinydb import where
 
@@ -44,11 +45,11 @@ class PlayerManager(DataManager):
 
     def add(self, data):
         id = str(uuid.uuid4())
-        new_player = Player(id=id, first_name=data[0], last_name=data[1], birthdate=data[2], gender=data[3], ranking=data[4])
+        new_player = Player(id=id, first_name=data[0], last_name=data[1], birthdate=data[2], gender=data[3], ranking=int(data[4]))
         self.player_store.insert(json.loads(new_player.json()))
     
     def get_all(self) -> List[Player]:
-        return [Player(**playerdata) for playerdata in players.all()]
+        return [Player(**playerdata) for playerdata in self.player_store.all()]
 
     def make_option_list(self,option_base_route):
         option_list = []
@@ -62,6 +63,47 @@ class PlayerManager(DataManager):
     def get_by_id(self, player_id):
         return self.player_store.search(where('id') == player_id)[0]
 
+    def get_by_identity(self,last_name,first_name,birthdate,ranking):
+        return self.player_store.search((where('first_name') == first_name) & (where('last_name') == last_name) & (where('ranking') == ranking) & (where('birthdate') == birthdate))
+    
+
+
+class TournamentManager(DataManager):
+    validators = validator.tournament_validators
+    tournament_store = tournaments
+    player_manager: PlayerManager
+
+    def __init__(self, player_manager) -> None:
+        super().__init__()
+        self.player_manager = player_manager
+
+    def add(self, data):
+        id = str(uuid.uuid4())
+        player_identities = list(filter(bool,data[5].split(' / ')))
+        player_ids = []
+        for identity in player_identities:
+            query_words = list(filter(bool,identity.split(' ')))
+            db_response = self.player_manager.get_by_identity(query_words[0], query_words[1], query_words[2], int(query_words[3]))[0]
+            player_id = db_response['id']
+            player_ids.append(player_id)
+        new_tournament = Tournament(id=id,name=data[0], venue=data[1], start_date=data[2], end_date=data[3], number_of_rounds=data[4],rounds=[],players=player_ids,time_control=data[6],comments=data[7])
+        self.tournament_store.insert(json.loads(new_tournament.json()))
+
+    def update(self, data, tournament_id):
+        self.tournament_store.update(data, where('id') == tournament_id)
+
+    def get_all(self):
+        tournaments = []
+        for tournament in self.tournament_store.all():
+            tournaments.append(Tournament(**tournament))
+        return tournaments
+
+    def get_by_id(self, tournament_id):
+        return self.tournament_store.search(where('id') == tournament_id)[0]
+
+    def get_all_players(self) -> List[Player]:
+        return self.player_manager.get_all()
+    
 class ViewManager():
     views: Dict = {}
 
@@ -79,7 +121,7 @@ class ViewManager():
         else:
             view = self.views[view_name]['view']()
             view.render()
-    
+
     def send(self,view_name,*data):
         update_data = len(data) > 1
         user_input = data[0]

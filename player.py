@@ -29,7 +29,7 @@ class Player(BaseModel):
         super().__init__(**data)
 
     def __repr__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.last_name} {self.first_name} {self.birthdate} {self.ranking} / "
     
     def get_info(self):
         return f"{self.ranking} - {self.first_name} {self.last_name}"

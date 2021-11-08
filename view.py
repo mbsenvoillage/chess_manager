@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 import os
-from manager import DataManager, Router, ViewManager
+from manager import Router, ViewManager
 from settings_loader import get_default_form_layout, get_default_page_layout, get_exit_route, get_quit_command
+import readline
 
 
 def get_page_layout(view):
@@ -86,38 +87,66 @@ class Menu(View):
 class FormField():
     text: str
     type: str
+    options: list[str]
 
-    def __init__(self, text, type) -> None:
+    def __init__(self, text, type, options = []) -> None:
         self.text = text
         self.type = type
+        self.options = options
+        
+class Completer(object):
+    type_of_field_to_complete: str
+    
+    def __init__(self, options, type_of_field_to_complete):
+        self.options = sorted(options)
+        self.type_of_field_to_complete = type_of_field_to_complete
+        return
 
+    def complete(self, text, state):        
+        response = None
+        if state == 0:
+            if text:
+                self.matches = [s for s in self.options if s and s.startswith(text)]               
+            else:
+                self.matches = self.options
+        try:
+            response = self.matches[state]
+        except IndexError:
+            response = None
+        return response
 class Form(View):
 
     form_fields: List[FormField]
     view_manager: ViewManager
+    completer: Optional[Completer]
 
-    def __init__(self, name, router, title, info, form_fields, view_manager) -> None:
+    def __init__(self, name, router, title, info, form_fields, view_manager, completer = None) -> None:
         super().__init__(name, router, title, info)
         self.form_fields = []
         for field in form_fields:
             self.form_fields.append(FormField(text=field[0], type=field[1]))
         self._page_layout = get_page_layout(self)
         self.view_manager = view_manager
+        self.completer = completer
 
     def handle_user_input(self):
         inputs = []
         for field in self.form_fields:
-            user_input = input(field.text)
-            is_input_valid = self.is_valid(user_input, field.type)
-            while not is_input_valid:
-                print("Submitted data is incorrect. Please enter valid data.")
+            if self.completer is not None and field.type == self.completer.type_of_field_to_complete:
+                    readline.set_completer(self.completer.complete)
+                    readline.parse_and_bind('tab: complete')
+            user_input = ''
+            is_input_valid = False
+            while not is_input_valid:    
                 user_input = input(field.text)
                 is_input_valid = self.is_valid(user_input, field.type)
+                if not is_input_valid:
+                    print("Submitted data is incorrect. Please enter valid data.")
             inputs.append(user_input)
-        send_data = input('Do you want to add the player to the database ? (yes/no) ')
+        send_data = input('Do you want to add the data to the database ? (yes/no) ')
         if send_data == 'yes':
             self.submit_data(inputs)
-        self.redirect_to('/player')
+        self.redirect_to('/')
 
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info,"\n")

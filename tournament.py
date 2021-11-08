@@ -31,20 +31,17 @@ def generate_round_results(round: Round):
     return copyOfRound
 
 class Tournament(BaseModel):
-    id: str = str(uuid.uuid4())
+    id: str 
     name: str
     venue: str
     start_date: Optional[date]
     end_date: Optional[date]
     number_of_rounds: int = 4
     rounds: list[Round]
-    players: list[Player]
+    players: list[str]
     time_control: TimeControl
     comments: str = ''
-
-    def __init__(self, **data) -> None:
-        super().__init__(**data)
-    
+ 
     @validator('players')
     def is_number_of_players_even(cls, value):
         if len(value) % 2 != 0:
@@ -56,6 +53,3 @@ class Tournament(BaseModel):
         if len(value) < 8:
             raise ValueError('There should be at least eight participants for the tournament')
         return value
-
-# tournament = Tournament(name="Arctic Chess",venue="Royal Palace of Norway",rounds=[],players=gen_list_of_players(7),time_control='Bullet')
-# print(tournament)
