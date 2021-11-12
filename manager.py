@@ -69,9 +69,6 @@ class PlayerManager(DataManager):
     def get_by_identity(self,last_name,first_name,birthdate,ranking):
         return self.player_store.search((where('first_name') == first_name) & (where('last_name') == last_name) & (where('ranking') == ranking) & (where('birthdate') == birthdate))
     
-print(PlayerManager().get_ranking("cb803b0f-cffe-45ce-b01f-f49933bfa9bd"))
-
-
 class TournamentManager(DataManager):
     validators = validator.tournament_validators
     tournament_store = tournaments
@@ -88,7 +85,7 @@ class TournamentManager(DataManager):
         for identity in player_identities:
             query_words = list(filter(bool,identity.split(' ')))
             db_response = self.player_manager.get_by_identity(query_words[0], query_words[1], query_words[2], int(query_words[3]))[0]
-            players.append(db_response)
+            players.append(db_response['id'])
         new_tournament = Tournament(id=id,name=data[0], venue=data[1], start_date=data[2], end_date=data[3], number_of_rounds=data[4],rounds=[],players=players,time_control=data[6],comments=data[7])
         self.tournament_store.insert(json.loads(new_tournament.json()))
 
@@ -98,13 +95,9 @@ class TournamentManager(DataManager):
     def get_all(self) -> List[Tournament]:
         tournaments = []
         players = []
-        for tournament in self.tournament_store.all():
-            for player in tournament['players']:
-                players.append(Player(**player))
-            
-                
-        #     tournaments.append(Tournament(**tournament))
-        # return tournaments
+        for tournament in self.tournament_store.all():         
+            tournaments.append(Tournament(**tournament))
+            return tournaments
 
     def get_by_id(self, tournament_id):
         return self.tournament_store.search(where('id') == tournament_id)[0]
@@ -168,6 +161,3 @@ class Router():
         else:
             view_name = self.get_view_name_from_route(route)
             self.view_manager.get_view(view_name)
-
-
-print(TournamentManager(PlayerManager()).get_all())
