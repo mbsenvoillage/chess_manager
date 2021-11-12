@@ -24,5 +24,10 @@ static_view_content = {
         'title': 'Add New Player',
         'info': ['All form fields must be filled in order to add the new player to the database'],
         'form_fields': [["Player's first name : ", "first_name"], ["Player's last name : ", "last_name"], ["Player's date of birth [yyyy-mm-dd] : ", "birthdate"], ["Player's gender [M/F] : ", "gender"], ["Player's ranking : ", "ranking"]]
+    },
+    'TOURNAMENT_CREATE': {
+        'title': 'Add New Tournament',
+        'info': ['All form fields must be filled in order to add the new tournament to the database'],
+        'form_fields': [["Tournament's name : ", "name"], ["Tournament's venue : ", "venue"], ["Tournament's start date [yyyy-mm-dd] : ", "start_date"], ["Tournament's end date : ", "end_date"], ["Number of rounds (value set to four rounds by default) : ", "number_of_rounds"], ["List of players (press tab for autocompletion and enter once the list is complete : ", "players"], ["Tournament's time control (Blitz/Rapid/Bullet) : ", "time_control"], ["Comments : ", "comments"]]
     }
 }
