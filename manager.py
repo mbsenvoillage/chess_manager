@@ -80,29 +80,36 @@ class TournamentManager(DataManager):
     def add(self, data):
         id = str(uuid.uuid4())
         player_identities = list(filter(bool,data[5].split(' / ')))
-        player_ids = []
+        players = []
         for identity in player_identities:
             query_words = list(filter(bool,identity.split(' ')))
             db_response = self.player_manager.get_by_identity(query_words[0], query_words[1], query_words[2], int(query_words[3]))[0]
-            player_id = db_response['id']
-            player_ids.append(player_id)
-        new_tournament = Tournament(id=id,name=data[0], venue=data[1], start_date=data[2], end_date=data[3], number_of_rounds=data[4],rounds=[],players=player_ids,time_control=data[6],comments=data[7])
+            players.append(db_response)
+        new_tournament = Tournament(id=id,name=data[0], venue=data[1], start_date=data[2], end_date=data[3], number_of_rounds=data[4],rounds=[],players=players,time_control=data[6],comments=data[7])
         self.tournament_store.insert(json.loads(new_tournament.json()))
 
     def update(self, data, tournament_id):
         self.tournament_store.update(data, where('id') == tournament_id)
 
-    def get_all(self):
+    def get_all(self) -> List[Tournament]:
         tournaments = []
+        players = []
         for tournament in self.tournament_store.all():
-            tournaments.append(Tournament(**tournament))
-        return tournaments
+            for player in tournament['players']:
+                players.append(Player(**player))
+            
+                
+        #     tournaments.append(Tournament(**tournament))
+        # return tournaments
 
     def get_by_id(self, tournament_id):
         return self.tournament_store.search(where('id') == tournament_id)[0]
-
-    def get_all_players(self) -> List[Player]:
-        return self.player_manager.get_all()
+    
+    def make_option_list(self,option_base_route):
+        option_list = []
+        for index, tournament in enumerate(self.get_all()):
+            option_list.append([f"{index+1}. {tournament.name} {tournament.venue}", f"{option_base_route}{tournament.id}"])
+        return option_list
     
 class ViewManager():
     views: Dict = {}
@@ -157,3 +164,6 @@ class Router():
         else:
             view_name = self.get_view_name_from_route(route)
             self.view_manager.get_view(view_name)
+
+
+print(TournamentManager(PlayerManager()).get_all())

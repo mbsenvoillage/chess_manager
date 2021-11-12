@@ -18,7 +18,7 @@ static_view_content = {
     'TOURNAMENT_MENU': {
         'title': 'Tournament Menu',
         'info': ['Create a new tournament, or edit an existing one.','Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options': [['1. Create Tournament', '/tournament/create'], ['2. Edit Tournament', '/tournament/edit']],
+        'options': [['1. Create Tournament', '/tournament/create'], ['2. Edit Tournament', '/tournament/edit/menu']],
     },
     'PLAYER_CREATE': {
         'title': 'Add New Player',
@@ -29,5 +29,9 @@ static_view_content = {
         'title': 'Add New Tournament',
         'info': ['All form fields must be filled in order to add the new tournament to the database'],
         'form_fields': [["Tournament's name : ", "name"], ["Tournament's venue : ", "venue"], ["Tournament's start date [yyyy-mm-dd] : ", "start_date"], ["Tournament's end date : ", "end_date"], ["Number of rounds (value set to four rounds by default) : ", "number_of_rounds"], ["List of players (press tab for autocompletion and enter once the list is complete : ", "players"], ["Tournament's time control (Blitz/Rapid/Bullet) : ", "time_control"], ["Comments : ", "comments"]]
+    },
+    'TOURNAMENT_EDIT': {
+        'title': 'Edit Tournaments',
+        'info': ['Select a tournament to edit round results.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu']
     }
 }
