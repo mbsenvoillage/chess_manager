@@ -62,10 +62,14 @@ class PlayerManager(DataManager):
 
     def get_by_id(self, player_id):
         return self.player_store.search(where('id') == player_id)[0]
+    
+    def get_ranking(self,player_id):
+        return self.get_by_id(player_id)['ranking']
 
     def get_by_identity(self,last_name,first_name,birthdate,ranking):
         return self.player_store.search((where('first_name') == first_name) & (where('last_name') == last_name) & (where('ranking') == ranking) & (where('birthdate') == birthdate))
     
+print(PlayerManager().get_ranking("cb803b0f-cffe-45ce-b01f-f49933bfa9bd"))
 
 
 class TournamentManager(DataManager):

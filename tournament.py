@@ -1,17 +1,14 @@
-from os import name
 import random
 from typing import List, Optional
-from uuid import uuid4
-import uuid
-from pydantic import BaseModel, validator, PositiveInt
+from pydantic import BaseModel, validator
 from datetime import date
 import copy
 from enums import TimeControl
 from player import Player
 
 class Match(BaseModel):
-    player_one: Player
-    player_two: Player
+    player_one: str
+    player_two: str
     player_one_result: Optional[int]
 
 class Round(BaseModel):
@@ -38,7 +35,7 @@ class Tournament(BaseModel):
     end_date: Optional[date]
     number_of_rounds: int = 4
     rounds: list[Round]
-    players: list[Player]
+    players: list[str]
     time_control: TimeControl
     comments: str = ''
     leaderboard: dict = {}
@@ -55,8 +52,8 @@ class Tournament(BaseModel):
 
     def init_leader_board(self) -> dict:
         leaderboard = {}
-        for player in self.players:
-            leaderboard[player.id] = [player, 0, set()]
+        for player_id in self.players:
+            leaderboard[player_id] = [player_id, 0, set()]
         self.leaderboard = leaderboard
         return leaderboard
 
@@ -107,7 +104,8 @@ class Tournament(BaseModel):
             except IndexError as error:
                 print("Cannot generate this round matches")
                 raise error
-            match = Match(player_one=self.leaderboard[player_id][0], player_two=self.leaderboard[player_id_list[next_playable_opponent_index]][0])
+            #Now storing player IDs in match
+            match = Match(player_one=player_id, player_two=player_id_list[next_playable_opponent_index])
             list_of_matches.append(match)
             player_id_list.pop(next_playable_opponent_index)
         return list_of_matches
