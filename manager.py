@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from database import players, tournaments
 import uuid
 from tinydb import where
+import matchmaker
 
 load_dotenv()
 
@@ -86,7 +87,9 @@ class TournamentManager(DataManager):
             query_words = list(filter(bool,identity.split(' ')))
             db_response = self.player_manager.get_by_identity(query_words[0], query_words[1], query_words[2], int(query_words[3]))[0]
             players.append(db_response['id'])
-        new_tournament = Tournament(id=id,name=data[0], venue=data[1], start_date=data[2], end_date=data[3], number_of_rounds=data[4],rounds=[],players=players,time_control=data[6],comments=data[7])
+        new_tournament = Tournament(id=id,name=data[0], venue=data[1], start_date=data[2], end_date=data[3], number_of_rounds=data[4],rounds=[],players=players,time_control=data[6],comments=data[7],leaderboard=matchmaker.init_leader_board(players))
+        round1 = matchmaker.make_round(new_tournament)
+        new_tournament.rounds.append(round1)
         self.tournament_store.insert(json.loads(new_tournament.json()))
 
     def update(self, data, tournament_id):

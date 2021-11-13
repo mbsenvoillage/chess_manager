@@ -173,8 +173,7 @@ class FormEdit(Form):
             value = data[key]
             original_field_text = field.text
             field.text = f"{original_field_text}{value}\nNew value : "
-
-        
+     
     def handle_user_input(self):
         inputs = {}
         for field in self.form_fields:
