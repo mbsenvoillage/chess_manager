@@ -33,7 +33,7 @@ def init_leader_board(players: list[str]) -> dict:
     leaderboard = {}
     for id in players:
         player = PlayerManager().get_by_id(id)
-        leaderboard[player['id']] = [player['ranking'], 0, set()]
+        leaderboard[player['id']] = [player['ranking'], 0, []]
     return leaderboard
 
 
@@ -59,10 +59,10 @@ def update_leaderboard_player_rankings(players: list[dict], leaderboard: dict) -
 def update_leaderboard_standings(leaderboard, round: Round) -> dict:
     leaderboard = copy.deepcopy(leaderboard)
     for match in round.matches:
-            leaderboard[match.player_one][1] += match.player_one_result
-            leaderboard[match.player_one][2].add(match.player_two)
-            leaderboard[match.player_two][1] += 1 - match.player_one_result
-            leaderboard[match.player_two][2].add(match.player_one)
+            leaderboard[match.player_one][1] += int(match.player_one_result)
+            leaderboard[match.player_one][2].append(match.player_two)
+            leaderboard[match.player_two][1] += 1 - int(match.player_one_result)
+            leaderboard[match.player_two][2].append(match.player_one)
     return leaderboard
 
 def sort_leaderboard(leaderboard: dict) -> dict:

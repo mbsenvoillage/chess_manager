@@ -117,17 +117,25 @@ class Completer(object):
 class Form(View):
 
     form_fields: List[FormField]
-    view_manager: ViewManager
+    view_manager: ViewManager 
     completer: Optional[Completer]
+    data_id: str = None
 
     def __init__(self, name, router, title, info, form_fields, view_manager, completer = None) -> None:
         super().__init__(name, router, title, info)
         self.form_fields = []
-        for field in form_fields:
-            self.form_fields.append(FormField(text=field[0], type=field[1]))
+        if form_fields: 
+            for field in form_fields:
+                self.form_fields.append(FormField(text=field[0], type=field[1]))
         self._page_layout = get_page_layout(self)
         self.view_manager = view_manager
         self.completer = completer
+
+    def __call__(self, data : dict, id) -> None:
+        self.data_id = id
+        for field in data:
+            self.form_fields.append(FormField(**field))
+        return self
 
     def handle_user_input(self):
         inputs = []
@@ -145,7 +153,10 @@ class Form(View):
             inputs.append(user_input)
         send_data = input('Do you want to add the data to the database ? (yes/no) ')
         if send_data == 'yes':
-            self.submit_data(inputs)
+            if self.data_id is None:
+                self.submit_data(inputs)
+            else:
+                self.submit_data(inputs,self.data_id)
         self.redirect_to('/')
 
     def format_view_content(self) -> str:
@@ -164,15 +175,8 @@ class FormEdit(Form):
 
     def __call__(self, data : dict, id) -> None:
         self.data_id = id
-        self.edit_form_fields(data)
+        self.form_fields = data
         return self
-
-    def edit_form_fields(self,data):
-        for field in self.form_fields:
-            key = field.type
-            value = data[key]
-            original_field_text = field.text
-            field.text = f"{original_field_text}{value}\nNew value : "
      
     def handle_user_input(self):
         inputs = {}
