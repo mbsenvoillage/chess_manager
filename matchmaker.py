@@ -91,7 +91,7 @@ def make_round(tournament: Tournament) -> Round:
         if not all_round_matches_played(tournament):
             raise ValueError('Cannot generate next round matches until all matches from current round have been played') 
         try:
-            new_round = Round(name=f"Round{len(tournament.rounds)}", matches=generate_round_matches(tournament.leaderboard))
+            new_round = Round(name=f"Round{len(tournament.rounds)+1}", matches=generate_round_matches(tournament.leaderboard))
         except Exception as e:
             print("Tournament cannot go on with the current matching system")
             raise e
