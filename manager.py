@@ -49,8 +49,13 @@ class PlayerManager(DataManager):
         new_player = Player(id=id, first_name=data[0], last_name=data[1], birthdate=data[2], gender=data[3], ranking=int(data[4]))
         self.player_store.insert(json.loads(new_player.json()))
     
-    def get_all(self) -> List[Player]:
-        return [Player(**playerdata) for playerdata in self.player_store.all()]
+    def get_all(self,order_by: str = '') -> List[Player]:
+        players = [Player(**playerdata) for playerdata in self.player_store.all()]
+        if order_by == 'alpha':
+            players.sort(key=lambda x: x.last_name)
+        if order_by == 'ranking':
+            players.sort(key=lambda x: x.ranking)    
+        return players
 
     def make_option_list(self,option_base_route):
         option_list = []

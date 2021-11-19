@@ -5,6 +5,7 @@ import os
 from manager import Router, ViewManager
 from settings_loader import get_default_form_layout, get_default_page_layout, get_exit_route, get_quit_command
 import readline
+from prettytable import PrettyTable
 
 
 def get_page_layout(view):
@@ -87,11 +88,20 @@ class Menu(View):
 class Report(View):
 
     search_results: list[str]
+    table_headers: list
 
-    def __init__(self, name, router, title, info, search_results) -> None:
+    def __init__(self, name, router, title, info, search_results,table_headers) -> None:
         super().__init__(name, router, title, info)
         self.search_results = search_results
         self._page_layout = get_page_layout(self)
+        self.table_headers = table_headers
+
+    def build_table(self):
+        x = PrettyTable()
+        x.field_names = self.table_headers
+        for result in self.search_results:
+            x.add_row(result)
+        return x
 
     def handle_user_input(self):
         selected_option = input()
@@ -104,8 +114,8 @@ class Report(View):
 
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info,"\n")
-        search_results = super().concatenate_with(self.search_results,"\n")
-        return self._page_layout.format(self.title, info, search_results)
+        # search_results = super().concatenate_with(self.search_results,"\n")
+        return self._page_layout.format(self.title, info, self.build_table())
 
 
 class FormField():

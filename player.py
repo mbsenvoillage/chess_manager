@@ -32,7 +32,7 @@ class Player(BaseModel):
         return f"{self.last_name} {self.first_name} {self.birthdate} {self.ranking} / "
     
     def get_info(self):
-        return f"{self.ranking} - {self.first_name} {self.last_name}"
+        return f"{self.last_name}, {self.first_name} - Ranking : {self.ranking} - Birthdate : {self.birthdate}"
 
 
 def gen_birthdate():

@@ -15,10 +15,6 @@ class Round(BaseModel):
     start_time: Optional[date]
     end_time: Optional[date]
     matches: List[Match]
-
-    def repr_matches(self):
-        for match in self.matches:
-            print(f"{match.player_one.get_info()} vs {match.player_two.get_info()} : {'TBP' if match.player_one_result is None else match.player_one_result} - {'TBP' if match.player_one_result is None else 1 - match.player_one_result}")
         
 def generate_round_results(round: Round):
     copyOfRound = copy.deepcopy(round)
