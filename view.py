@@ -84,6 +84,30 @@ class Menu(View):
         options = super().concatenate_with([option.text for option in self.options],"\n")
         return self._page_layout.format(self.title, info, options)
 
+class Report(View):
+
+    search_results: list[str]
+
+    def __init__(self, name, router, title, info, search_results) -> None:
+        super().__init__(name, router, title, info)
+        self.search_results = search_results
+        self._page_layout = get_page_layout(self)
+
+    def handle_user_input(self):
+        selected_option = input()
+        requested_route = ''
+        if selected_option == get_quit_command():
+            requested_route = get_exit_route()
+        else:
+            requested_route = get_exit_route()
+        self.redirect_to(requested_route)
+
+    def format_view_content(self) -> str:
+        info = super().concatenate_with(self.info,"\n")
+        search_results = super().concatenate_with(self.search_results,"\n")
+        return self._page_layout.format(self.title, info, search_results)
+
+
 class FormField():
     text: str
     type: str
