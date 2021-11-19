@@ -25,11 +25,15 @@ class App():
         reports_menu_content = static_view_content['REPORTS_MENU']
         reports_menu_player_content = static_view_content['REPORTS_MENU_PLAYER']
         reports_player_alpha = static_view_content['REPORTS_PLAYER_ALPHA']
+        reports_player_ranking = static_view_content['REPORTS_PLAYER_RANKING']
+
+        player_reports_table_headers =['Last Name', 'First Name', 'Ranking', 'Birthdate']
 
         players_for_autocomplete = lambda : [repr(player) for player in player_manager.get_all()]
         get_editable_players = lambda: player_manager.make_option_list('/player/edit/form?id=')
         get_editable_tournaments = lambda: tournament_manager.make_option_list('/tournament/edit/form?id=')
         get_players_sorted_alphabetically = lambda: [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in player_manager.get_all(order_by='alpha')]
+        get_players_sorted_by_ranking = lambda: [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in player_manager.get_all(order_by='ranking')]
 
         main_menu = lambda : Menu('main',router, *main_menu_content.values())
         player_menu = lambda : Menu('player',router, *player_menu_content.values())
@@ -42,7 +46,9 @@ class App():
         tournament_edit_form  = lambda : Form('tournament_edit_form',router,*edit_tournament_menu_content.values(),form_fields=[],view_manager=view_manager)
         reports_menu = lambda : Menu('reports',router,*reports_menu_content.values())
         reports_menu_player = lambda : Menu('reports_player',router,*reports_menu_player_content.values())
-        reports_players_sorted_alphabetically = lambda: Report('reports_player_alpha',router,*reports_player_alpha.values(), get_players_sorted_alphabetically(),table_headers=['Last Name', 'First Name', 'Ranking', 'Birthdate'])
+        reports_players_sorted_alphabetically = lambda: Report('reports_player_alpha',router,*reports_player_alpha.values(), get_players_sorted_alphabetically(),player_reports_table_headers)
+        reports_players_sorted_by_ranking = lambda: Report('reports_player_ranking',router,*reports_player_ranking.values(), get_players_sorted_by_ranking(),player_reports_table_headers)
+
 
         views = {'': {'view': main_menu, 'manager': None}, 
         'player': {'view': player_menu, 'manager': None}, 
@@ -56,6 +62,7 @@ class App():
         'reports': {'view': reports_menu,'manager': None},
         'reports_player': {'view': reports_menu_player, 'manager': None},
         'reports_player_alpha': {'view': reports_players_sorted_alphabetically, 'manager': None},
+        'reports_player_ranking': {'view': reports_players_sorted_by_ranking, 'manager': None},
         'exit': {'view': self.__quit_app, 'manager': None}
         }
         router = Router(view_manager(views))

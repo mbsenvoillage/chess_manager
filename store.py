@@ -49,10 +49,14 @@ static_view_content = {
     'REPORTS_MENU_PLAYER': {
         'title': "Players' Reports Menu",
         'info': ['Generate reports about players. Order the results alphabetically or by ranking', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options': [['1. All Players alphabetically', '/reports/player/alpha'], ['2. All Players by ranking', '/reports/tournament/ranking']],
+        'options': [['1. All Players alphabetically', '/reports/player/alpha'], ['2. All Players by ranking', '/reports/player/ranking']],
     },
     'REPORTS_PLAYER_ALPHA': {
         'title': "Players sorted alphabetically",
         'info': ['This is a list of all players from the app database sorted alphabetically', 'Press q and enter to navigate to main menu'],
+    },
+    'REPORTS_PLAYER_RANKING': {
+        'title': "Players sorted by ranking",
+        'info': ['This is a list of all players from the app database sorted by ranking', 'Press q and enter to navigate to main menu'],
     },
 }

@@ -54,7 +54,7 @@ class PlayerManager(DataManager):
         if order_by == 'alpha':
             players.sort(key=lambda x: x.last_name)
         if order_by == 'ranking':
-            players.sort(key=lambda x: x.ranking)    
+            players.sort(key=lambda x: x.ranking, reverse=True)    
         return players
 
     def make_option_list(self,option_base_route):
