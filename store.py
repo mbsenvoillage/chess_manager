@@ -2,7 +2,7 @@ static_view_content = {
     'MAIN_MENU': {
         'title': 'Welcome to ChessManager 1.0',
         'info': ['Welcome to Chess Manager, your companion to successful chess tournament management.', 'Pick an option from the list below and press enter.'],
-        'options': [['1. Manage Players', '/player'], ['2. Manage Tournaments','/tournament'], ['3. Generate Data Reports', '/reports'], ['4. Manage App Data', '/appdata'], ['5. Quit','/exit']],
+        'options': [['1. Manage Players', '/player'], ['2. Manage Tournaments','/tournament'], ['3. Generate Data Reports', '/reports'], ['4. Quit','/exit']],
     },
     'PLAYER_MENU': {
         'title': 'Player Menu',
@@ -40,5 +40,10 @@ static_view_content = {
      'TOURNAMENT_EDIT_FORM': {
         'title': 'Add Round Results',
         'info': ['All form fields must be filled in order for the round results to be added in the database'],
-    }
+    },
+    'REPORTS_MENU': {
+        'title': "Reports' Menu",
+        'info': ['Generate reports about tournaments or players.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
+        'options': [['1. Player Reports', '/reports/player'], ['2. Tournament Reports', '/reports/tournament']],
+    },
 }

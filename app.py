@@ -22,6 +22,7 @@ class App():
         tournament_create_content = static_view_content['TOURNAMENT_CREATE']
         tournament_edit_content = static_view_content['TOURNAMENT_EDIT_MENU']
         edit_tournament_menu_content = static_view_content['TOURNAMENT_EDIT_FORM']
+        reports_menu_content = static_view_content['REPORTS_MENU']
 
         players_for_autocomplete = lambda : [repr(player) for player in player_manager.get_all()]
         get_editable_players = lambda: player_manager.make_option_list('/player/edit/form?id=')
@@ -36,6 +37,7 @@ class App():
         tournament_create = lambda : Form('tournament_create',router,*tournament_create_content.values(), view_manager, Completer(players_for_autocomplete(),'players'))
         tournament_edit_menu = lambda : Menu('tournament_edit_menu',router,*tournament_edit_content.values(),get_editable_tournaments())
         tournament_edit_form  = lambda : Form('tournament_edit_form',router,*edit_tournament_menu_content.values(),form_fields=[],view_manager=view_manager)
+        reports_menu = lambda : Menu('reports',router,*reports_menu_content.values())
 
         views = {'': {'view': main_menu, 'manager': None}, 
         'player': {'view': player_menu, 'manager': None}, 
@@ -46,6 +48,7 @@ class App():
         'tournament_create': {'view': tournament_create, 'manager': tournament_manager},
         'tournament_edit_menu': {'view': tournament_edit_menu, 'manager': None},
         'tournament_edit_form': {'view': tournament_edit_form, 'manager': tournament_manager},
+        'reports': {'view': reports_menu,'manager': None},
         'exit': {'view': self.__quit_app, 'manager': None}
         }
         router = Router(view_manager(views))
