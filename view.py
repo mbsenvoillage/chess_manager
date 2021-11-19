@@ -114,7 +114,6 @@ class Report(View):
 
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info,"\n")
-        # search_results = super().concatenate_with(self.search_results,"\n")
         return self._page_layout.format(self.title, info, self.build_table())
 
 
