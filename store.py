@@ -46,4 +46,9 @@ static_view_content = {
         'info': ['Generate reports about tournaments or players.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
         'options': [['1. Player Reports', '/reports/player'], ['2. Tournament Reports', '/reports/tournament']],
     },
+    'REPORTS_MENU_PLAYER': {
+        'title': "Players' Reports Menu",
+        'info': ['Generate reports about players. Order the results alphabetically or by ranking', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
+        'options': [['1. All Players alphabetically', '/reports/player/alpha'], ['2. All Players by ranking', '/reports/tournament/ranking']],
+    },
 }
