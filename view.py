@@ -3,11 +3,10 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Union
 import os
 from Router.router import Router
-from manager import ViewManager
 from settings_loader import get_default_form_layout, get_default_page_layout, get_exit_route, get_quit_command
 import readline
 from prettytable import PrettyTable
-from Controllers.controllers import Controller, FormController
+
 
 
 def get_page_layout(view):
@@ -16,6 +15,7 @@ def get_page_layout(view):
 @dataclass
 class View(ABC):
     """View parent class"""
+    from Controllers.controllers import Controller, FormController
     title: str 
     info: List[str]  
     controller: Union[Controller, FormController]

@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List
+from typing import Dict, List
 from abc import ABC, abstractmethod
 import json
 from player import Player
@@ -10,7 +10,6 @@ from database import players, tournaments
 import uuid
 from tinydb import where
 import matchmaker
-import copy
 
 load_dotenv()
 
@@ -88,7 +87,7 @@ class TournamentManager(DataManager):
 
     def add(self, data: dict) -> None:
         id = str(uuid.uuid4())
-        player_identities = list(filter(bool,data[5].split(' / ')))
+        player_identities = list(filter(bool,data['players'].split(' / ')))
         players = []
         for identity in player_identities:
             query_words = list(filter(bool,identity.split(' ')))
@@ -96,28 +95,28 @@ class TournamentManager(DataManager):
             players.append(db_response['id'])
         params = {
             'id': id,
-            'name': data[0],
-            'venue': data[1],
-            'start_date': data[2],
-            'end_date': data[3],
-            'number_of_rounds': data[4],
+            'name': data['name'],
+            'venue': data['venue'],
+            'start_date': data['start_date'],
+            'end_date': data['end_date'],
+            'number_of_rounds': data['number_of_rounds'],
             'rounds': [],
             'players': players,
-            'time_control': data[6],
-            'comments': data[7],
+            'time_control': data['time_control'],
+            'comments': data['comments'],
             'leaderboard': matchmaker.init_leader_board(players)
         }
         new_tournament = Tournament(**params)
-        round1 = matchmaker.make_round(new_tournament)
-        new_tournament.rounds.append(round1)
+        new_tournament.rounds.append(matchmaker.make_round(new_tournament))
         self.tournament_store.insert(json.loads(new_tournament.json()))
 
     def update(self, data: dict, tournament_id: str) -> None:
-        scores = data
+        scores = list(data.values())
         tournament = Tournament(**self.get_by_id(tournament_id))
         players = [PlayerManager().get_by_id(id) for id in tournament.players]
         for idx, match in enumerate(tournament.rounds[-1].matches):
-            match.player_one_result = int(scores[idx])
+            score = 0.5 if scores[idx] == '0.5' else int(scores[idx])
+            match.player_one_result = score
         updated_leaderboard = matchmaker.update_leaderboard(players,tournament)
         tournament.leaderboard = updated_leaderboard
         round = matchmaker.make_round(tournament)
@@ -131,55 +130,11 @@ class TournamentManager(DataManager):
         return tournaments
 
     def get_by_id(self, tournament_id):
-        return self.tournament_store.search(where('id') == tournament_id)[0]
-    
-    def make_option_list(self,option_base_route):
-        option_list = []
-        for index, tournament in enumerate(self.get_all()):
-            option_list.append([f"{index+1}. {tournament.name} - Venue: {tournament.venue}", f"{option_base_route}{tournament.id}"])
-        return option_list
+        return self.tournament_store.search(where('id') == tournament_id)[0]    
 
-    def make_form(self,entity: dict,form_fields = []):
-        fields = []
-        for match in entity['rounds'][-1]['matches']:
-            field = {'type': 'match'}
-            player_one = PlayerManager().get_by_id(match['player_one'])
-            player_two = PlayerManager().get_by_id(match['player_two'])
-            text = f"{player_one['first_name']} {player_one['last_name']} vs {player_two['first_name']} {player_two['last_name']}\n{player_one['first_name']} {player_one['last_name']}'s score : "
-            field['text'] = text
-            fields.append(field)
-        return fields
-    
-class ViewManager():
-    views: Dict = {}
 
-    def __call__(self, views) -> Any:
-        self.views = views
-        return self
+l = {'one': 1, 'two': 2, 'three': 3}
 
-    def get_view(self,view_name,params=None):
-        if params:
-            entity = self.views[view_name]['manager'].get_by_id(params)
-            view = self.views[view_name]['view']()
-            make_form_params = [entity]
-            if view.form_fields:
-                make_form_params.append(view.form_fields)
-            data = self.views[view_name]['manager'].make_form(*make_form_params)
-            view(data,params).render()
-        elif view_name == 'exit':
-            self.views[view_name]['view']()
-        else:
-            view = self.views[view_name]['view']()
-            view.render()
+s = l.values()
 
-    def send(self,view_name,*data):
-        update_data = len(data) > 1
-        user_input = data[0]
-        if update_data:    
-            id = data[1]
-            self.views[view_name]['manager'].update(user_input,id)
-        else:
-            self.views[view_name]['manager'].add(user_input)
-
-    def validate(self,view_name,user_input,field_type):
-        return self.views[view_name]['manager'].validate(user_input,field_type)
+print(list(s))

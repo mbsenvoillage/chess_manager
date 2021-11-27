@@ -5,8 +5,6 @@ from manager import PlayerManager, TournamentManager
 from Router.router import Router
 from settings_loader import get_default_form_layout, get_default_page_layout
 from store import static_view_content
-
-
 class Controller(ABC):
     router: Router
     data_manager: Union[PlayerManager,TournamentManager]
@@ -71,12 +69,39 @@ class PlayerMenuController(Controller):
     def validate_command(self, command):
         pass
 
+class TournamentMenuController(Controller):
+    
+    def index(self, data):
+        from view import Menu
+        tournament_menu_content = tournament_menu_content = static_view_content['TOURNAMENT_MENU']
+        return Menu(self, get_default_page_layout(), *tournament_menu_content.values()).render()
+
+    def validate_command(self, command):
+        pass
+
 class CreatePlayerFormController(FormController):
 
     def index(self, data):
         from view import Form
         player_create_content = static_view_content['PLAYER_CREATE']
         return Form(self, get_default_form_layout(),*player_create_content.values()).render()
+
+    def validate_command(self, command):
+        pass
+
+    def validate_input(self, input,field_type):
+        return self.data_manager.validate(input,field_type)
+
+    def submit(self, inputs):
+        self.data_manager.add(inputs)
+
+class CreateTournamentFormController(FormController):
+
+    def index(self, data):
+        from view import Form, Completer
+        tournament_create_content = static_view_content['TOURNAMENT_CREATE']
+        players_for_autocomplete = lambda : [repr(player) for player in self.data_manager.player_manager.get_all()]
+        return Form(self,get_default_form_layout(),*tournament_create_content.values(), Completer(players_for_autocomplete(),'players')).render()
 
     def validate_command(self, command):
         pass
@@ -104,6 +129,23 @@ class EditPlayerMenuController(Controller):
             list_of_options.append([f"{index+1}. {player.first_name} {player.last_name}", f"{base_route}{player.id}"])
         return list_of_options
 
+class EditTournamentMenuController(Controller):
+
+    def index(self, data):
+        from view import Menu
+        tournament_edit_content = static_view_content['TOURNAMENT_EDIT_MENU']
+        options = self.make_menu_options('/tournament/edit/form?id=')
+        return Menu(self, get_default_page_layout(), *tournament_edit_content.values(), options).render()
+
+    def validate_command(self, command):
+        pass
+
+    def make_menu_options(self,base_route):
+        option_list = []
+        for index, tournament in enumerate(self.data_manager.get_all()):
+            option_list.append([f"{index+1}. {tournament.name} - Venue: {tournament.venue}", f"{base_route}{tournament.id}"])
+        return option_list
+
 class EditPlayerFormController(FormController):
 
     def index(self,data):
@@ -130,4 +172,36 @@ class EditPlayerFormController(FormController):
             value = entity[key]
             original_field_text = field.text
             field.text = f"{original_field_text}{value}\nNew value : "
+        return fields
+
+class EditTournamentFormController(FormController):
+
+    def index(self,data):
+        from view import Form
+        edit_tournament_form_content = static_view_content['TOURNAMENT_EDIT_FORM']
+        form = Form(self, get_default_form_layout(), *edit_tournament_form_content.values(),form_fields=[])
+        form_fields = self.make_form(self.data_manager.get_by_id(data))
+        form.form_fields = form_fields
+        return form.render()
+
+    def validate_command(self, command):
+        pass
+
+    def validate_input(self, input,field_type):
+        return self.data_manager.validate(input,'match')
+
+    def submit(self, inputs):
+        self.data_manager.update(inputs,self.data_id)
+    
+    def make_form(self,entity: dict):
+        from view import FormField
+        fields = []
+        for idx, match in enumerate(entity['rounds'][-1]['matches']):
+            field_params = {'type': f'match{idx+1}'}
+            player_one = PlayerManager().get_by_id(match['player_one'])
+            player_two = PlayerManager().get_by_id(match['player_two'])
+            text = f"{player_one['first_name']} {player_one['last_name']} vs {player_two['first_name']} {player_two['last_name']}\n{player_one['first_name']} {player_one['last_name']}'s score : "
+            field_params['text'] = text
+            field = FormField(**field_params)
+            fields.append(field)
         return fields
