@@ -64,12 +64,6 @@ class PlayerManager(DataManager):
             players.sort(key=lambda x: x.ranking, reverse=True)    
         return players
 
-    def make_option_list(self,option_base_route):
-        option_list = []
-        for index, player in enumerate(self.get_all()):
-            option_list.append([f"{index+1}. {player.first_name} {player.last_name}", f"{option_base_route}{player.id}"])
-        return option_list
-
     def update(self, data, player_id):
         if 'ranking' in data:
             ranking = int(data['ranking'])
@@ -82,14 +76,6 @@ class PlayerManager(DataManager):
     def get_by_identity(self,last_name,first_name,birthdate,ranking):
         return self.player_store.search((where('first_name') == first_name) & (where('last_name') == last_name) & (where('ranking') == ranking) & (where('birthdate') == birthdate))
     
-    def make_form(self,entity: dict,form_fields):
-        fields = copy.deepcopy(form_fields)
-        for field in fields:
-            key = field.type
-            value = entity[key]
-            original_field_text = field.text
-            field.text = f"{original_field_text}{value}\nNew value : "
-        return fields
     
 class TournamentManager(DataManager):
     validators = validator.tournament_validators

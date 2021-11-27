@@ -4,22 +4,13 @@ from player import Player
 # from store import static_view_content
 from manager import PlayerManager
 from Router.router import Router
-from Controllers.controllers import CreatePlayerFormController, MainMenuContoller, PlayerMenuController
+from Controllers.controllers import CreatePlayerFormController, EditPlayerFormController, EditPlayerMenuController, MainMenuContoller, PlayerMenuController
 
 class App():
 
     __mount_point: callable
 
     def __init__(self) -> None:
-        # player_manager = PlayerManager()
-        # view_manager = ViewManager()
-        # tournament_manager = TournamentManager(player_manager)
-
-        # main_menu_content = static_view_content['MAIN_MENU']
-        # player_menu_content = static_view_content['PLAYER_MENU']
-        # player_create_content = static_view_content['PLAYER_CREATE']
-        # edit_player_menu_content = static_view_content['PLAYER_EDIT_MENU']
-        # edit_player_form_content = static_view_content['PLAYER_EDIT_FORM']
         # tournament_menu_content = static_view_content['TOURNAMENT_MENU']
         # tournament_create_content = static_view_content['TOURNAMENT_CREATE']
         # tournament_edit_content = static_view_content['TOURNAMENT_EDIT_MENU']
@@ -32,15 +23,10 @@ class App():
         # player_reports_table_headers =['Last Name', 'First Name', 'Ranking', 'Birthdate']
 
         # players_for_autocomplete = lambda : [repr(player) for player in player_manager.get_all()]
-        # get_editable_players = lambda: player_manager.make_option_list('/player/edit/form?id=')
         # get_editable_tournaments = lambda: tournament_manager.make_option_list('/tournament/edit/form?id=')
         # get_players_sorted_alphabetically = lambda: [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in player_manager.get_all(order_by='alpha')]
         # get_players_sorted_by_ranking = lambda: [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in player_manager.get_all(order_by='ranking')]
 
-        # main_menu = lambda : Menu('main',router, *main_menu_content.values())
-        # player_menu = lambda : Menu('player',router, *player_menu_content.values())
-        # player_create = lambda : Form('player_create',router, *player_create_content.values(), view_manager)
-        # player_edit_menu = lambda : Menu('player_edit_menu',router, *edit_player_menu_content.values(), get_editable_players())
         # player_edit_form = lambda : FormEdit('player_edit_form',router, *edit_player_form_content.values(), view_manager)
         # tournament_menu = lambda : Menu('tournament',router, *tournament_menu_content.values())
         # tournament_create = lambda : Form('tournament_create',router,*tournament_create_content.values(), view_manager, Completer(players_for_autocomplete(),'players'))
@@ -74,10 +60,14 @@ class App():
         main_menu_controller = MainMenuContoller(router)
         player_menu_controller = PlayerMenuController(router)
         player_create_controller = CreatePlayerFormController(router,player_manager)
+        player_edit_menu_controller = EditPlayerMenuController(router,player_manager)
+        player_edit_form_controller = EditPlayerFormController(router,player_manager)
 
         router.add_route('/',main_menu_controller)
         router.add_route('/player',player_menu_controller)
         router.add_route('/player/create',player_create_controller)
+        router.add_route('/player/edit/menu',player_edit_menu_controller)
+        router.add_route('/player/edit/form?', player_edit_form_controller)
 
 
         self.__mount_point = router.start

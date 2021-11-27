@@ -192,12 +192,6 @@ class Form(View):
 
            
 class FormEdit(Form):
-    data_id: str = ''
-
-    def __call__(self, data : dict, id) -> None:
-        self.data_id = id
-        self.form_fields = data
-        return self
      
     def handle_user_input(self):
         inputs = {}
@@ -213,5 +207,5 @@ class FormEdit(Form):
             inputs[field.type] = user_input
         data_is_to_be_edited = input('Do you want to continue with this update ? (answer by yes or no) ')
         if data_is_to_be_edited == 'yes':
-            self.submit_data(inputs, self.data_id)
+            self.submit_data(inputs)
         self.redirect_to('/player/edit/menu')
