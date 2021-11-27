@@ -45,8 +45,15 @@ class PlayerManager(DataManager):
     player_store = players
 
     def add(self, data):
-        id = str(uuid.uuid4())
-        new_player = Player(id=id, first_name=data[0], last_name=data[1], birthdate=data[2], gender=data[3], ranking=int(data[4]))
+        params = {
+            'id': str(uuid.uuid4()), 
+            'first_name': data['first_name'], 
+            'last_name': data['last_name'], 
+            'birthdate': data['birthdate'], 
+            'gender': data['gender'], 
+            'ranking': int(data['ranking'])
+        }
+        new_player = Player(**params)
         self.player_store.insert(json.loads(new_player.json()))
     
     def get_all(self,order_by: str = '') -> List[Player]:
@@ -190,26 +197,3 @@ class ViewManager():
 
     def validate(self,view_name,user_input,field_type):
         return self.views[view_name]['manager'].validate(user_input,field_type)
-
-
-class Router():
-    view_manager: ViewManager
-
-    def __init__(self, view_manager) -> None:
-        self.view_manager = view_manager
-
-    def get_url_param(self, route):
-        import re
-        return re.split('/|=|\?',route)[-1]
-
-    def get_view_name_from_route(self, route):
-        return '_'.join(list(filter(bool, re.match("((\/[a-z]*)+)", route).group().split('/'))))
-
-    def route(self, route):
-        if "?" in route:
-            param = self.get_url_param(route)
-            view_name = self.get_view_name_from_route(route)
-            self.view_manager.get_view(view_name, param)
-        else:
-            view_name = self.get_view_name_from_route(route)
-            self.view_manager.get_view(view_name)

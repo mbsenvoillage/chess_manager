@@ -1,6 +1,5 @@
 from datetime import date
 from pydantic import BaseModel, validator, PositiveInt
-from pydantic.fields import PrivateAttr
 from pydantic.types import constr
 from enums import Gender
 from dateutil.relativedelta import relativedelta

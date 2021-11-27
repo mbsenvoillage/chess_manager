@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Union
 import os
-from manager import Router, ViewManager
+from Router.router import Router
+from manager import ViewManager
 from settings_loader import get_default_form_layout, get_default_page_layout, get_exit_route, get_quit_command
 import readline
 from prettytable import PrettyTable
+from Controllers.controllers import Controller, FormController
 
 
 def get_page_layout(view):
@@ -14,18 +16,17 @@ def get_page_layout(view):
 @dataclass
 class View(ABC):
     """View parent class"""
-    name: str
     title: str 
     info: List[str]  
-    _router: Router
-    _page_layout: str
+    controller: Union[Controller, FormController]
+    page_layout: str
  
-    def __init__(self, name, router, title, info) -> None:
+    def __init__(self, controller, page_layout, title, info) -> None:
         super().__init__()
-        self.name = name
-        self._router = router
+        self.controller = controller
         self.title = title
         self.info = info
+        self.page_layout = page_layout
 
     def render(self):
         self._clear_terminal()
@@ -44,9 +45,9 @@ class View(ABC):
         print(self.format_view_content())
 
     def redirect_to(self,route):
-        self._router.route(route)
+        self.controller.redirect_to(route)
 
-    def concatenate_with(self,elements_to_display: List[str], concatenator):
+    def concatenate_with(self,elements_to_display: List[str], concatenator: str):
         return concatenator.join(elements_to_display)
 
     def _clear_terminal(self):
@@ -64,13 +65,12 @@ class Menu(View):
 
     options: List[MenuOption]
 
-    def __init__(self, name, router, title, info, options) -> None:
-        super().__init__(name, router, title, info)
+    def __init__(self, controller, page_layout, title, info, options) -> None:
+        super().__init__(controller, page_layout, title, info)
         self.options = []
         for option in options:
             self.options.append(MenuOption(text=option[0], route=option[1]))
-        self._page_layout = get_page_layout(self)
-          
+
     def handle_user_input(self):
         selected_option = input()
         requested_route = ''
@@ -83,7 +83,7 @@ class Menu(View):
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info,"\n")
         options = super().concatenate_with([option.text for option in self.options],"\n")
-        return self._page_layout.format(self.title, info, options)
+        return self.page_layout.format(self.title, info, options)
 
 class Report(View):
 
@@ -120,7 +120,7 @@ class Report(View):
 class FormField():
     text: str
     type: str
-    options: list[str]
+    options: Optional[list[str]]
 
     def __init__(self, text, type, options = []) -> None:
         self.text = text
@@ -150,28 +150,19 @@ class Completer(object):
 class Form(View):
 
     form_fields: List[FormField]
-    view_manager: ViewManager 
     completer: Optional[Completer]
-    data_id: str = None
 
-    def __init__(self, name, router, title, info, form_fields, view_manager, completer = None) -> None:
-        super().__init__(name, router, title, info)
+    def __init__(self, controller, page_layout, title, info, form_fields, completer = None) -> None:
+        super().__init__(controller, page_layout, title, info)
         self.form_fields = []
         if form_fields: 
             for field in form_fields:
                 self.form_fields.append(FormField(text=field[0], type=field[1]))
-        self._page_layout = get_page_layout(self)
-        self.view_manager = view_manager
+        self.page_layout = page_layout
         self.completer = completer
 
-    def __call__(self, data : dict, id) -> None:
-        self.data_id = id
-        for field in data:
-            self.form_fields.append(FormField(**field))
-        return self
-
     def handle_user_input(self):
-        inputs = []
+        inputs = {}
         for field in self.form_fields:
             if self.completer is not None and field.type == self.completer.type_of_field_to_complete:
                     readline.set_completer(self.completer.complete)
@@ -183,24 +174,21 @@ class Form(View):
                 is_input_valid = self.is_valid(user_input, field.type)
                 if not is_input_valid:
                     print("Submitted data is incorrect. Please enter valid data.")
-            inputs.append(user_input)
+            inputs[field.type] = user_input
         send_data = input('Do you want to add the data to the database ? (yes/no) ')
         if send_data == 'yes':
-            if self.data_id is None:
-                self.submit_data(inputs)
-            else:
-                self.submit_data(inputs,self.data_id)
+            self.submit_data(inputs)
         self.redirect_to('/')
 
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info,"\n")
-        return self._page_layout.format(self.title, info)
+        return self.page_layout.format(self.title, info)
 
-    def submit_data(self,*data):
-        self.view_manager.send(self.name,*data)
+    def submit_data(self,inputs: dict):
+        self.controller.submit(inputs)
 
-    def is_valid(self, user_input, field_type):
-        return self.view_manager.validate(self.name, user_input, field_type)
+    def is_valid(self, user_input, field_type) -> bool:
+        return self.controller.validate_input(user_input, field_type)
 
            
 class FormEdit(Form):
