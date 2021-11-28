@@ -2,23 +2,17 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import List, Optional, Union
 import os
-from Router.router import Router
-from settings_loader import get_default_form_layout, get_default_page_layout, get_exit_route, get_quit_command
+from settings_loader import get_exit_route, get_quit_command
 import readline
 from prettytable import PrettyTable
-
-
-
-def get_page_layout(view):
-    return get_default_form_layout() if isinstance(view, Form) else get_default_page_layout()
 
 @dataclass
 class View(ABC):
     """View parent class"""
-    from Controllers.controllers import Controller, FormController
+    from Controllers.controllers import Controller, FormController, ExitController, ReportController
     title: str 
     info: List[str]  
-    controller: Union[Controller, FormController]
+    controller: Union[Controller, FormController, ExitController, ReportController]
     page_layout: str
  
     def __init__(self, controller, page_layout, title, info) -> None:

@@ -1,7 +1,6 @@
-import os
 from manager import PlayerManager, TournamentManager
 from Router.router import Router
-from Controllers.controllers import CreatePlayerFormController, CreateTournamentFormController, EditPlayerFormController, EditPlayerMenuController, EditTournamentFormController, EditTournamentMenuController, ExitController, MainMenuContoller, PlayerMenuController, PlayerReportsController, ReportsMenuController, TournamentMenuController
+from Controllers.controllers import CreatePlayerFormController, CreateTournamentFormController, EditPlayerFormController, EditPlayerMenuController, EditTournamentFormController, EditTournamentMenuController, ExitController, MainMenuContoller, PlayerMenuController, PlayerReportsController, ReportsMenuController, TournamentMenuController, TournamentReportsMenuController
 
 class App():
 
@@ -23,6 +22,7 @@ class App():
         tournament_edit_form_controller = EditTournamentFormController(router,tournament_manager)
         reports_menu_controller = ReportsMenuController(router)
         player_reports_controller = PlayerReportsController(router,player_manager)
+        tournament_reports_menu = TournamentReportsMenuController(router,tournament_manager)
         exit_controller = ExitController(router)
 
         router.add_route('/',main_menu_controller)
@@ -35,7 +35,8 @@ class App():
         router.add_route('/tournament/edit/menu',tournament_edit_menu_controller)
         router.add_route('/tournament/edit/form?',tournament_edit_form_controller)
         router.add_route('/reports',reports_menu_controller)
-        router.add_route('/reports/player',player_reports_controller)
+        router.add_route('/reports/players',player_reports_controller)
+        router.add_route('/reports/tournaments',tournament_reports_menu)
         router.add_route('/exit', exit_controller)
 
         self.launch = router.start

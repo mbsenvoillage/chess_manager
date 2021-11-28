@@ -137,6 +137,23 @@ class PlayerReportsController(ReportController):
         players = [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in self.data_manager.get_all(order_by)]
         self.index(players)
 
+class TournamentReportsMenuController(Controller):
+   
+    def index(self, data):
+        from view import Menu
+        tournaments_reports_content = static_view_content['REPORTS_MENU_TOURNAMENT']
+        options = self.make_menu_options('/reports/tournament?id=')
+        return Menu(self, get_default_page_layout(), *tournaments_reports_content.values(), options).render()
+
+    def validate_command(self, command):
+        pass
+
+    def make_menu_options(self,base_route):
+        option_list = []
+        for index, tournament in enumerate(self.data_manager.get_all()):
+            option_list.append([f"{index+1}. {tournament.name} \n\tVenue: {tournament.venue} \n\tStart date: {tournament.start_date} \n\tEnd date: {tournament.end_date}\n", f"{base_route}{tournament.id}"])
+        return option_list
+
 class CreatePlayerFormController(FormController):
 
     def index(self, data):

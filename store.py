@@ -44,7 +44,7 @@ static_view_content = {
     'REPORTS_MENU': {
         'title': "Reports' Menu",
         'info': ['Generate reports about tournaments or players.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
-        'options': [['1. Player Reports', '/reports/player'], ['2. Tournament Reports', '/reports/tournament']],
+        'options': [['1. Player Reports', '/reports/players'], ['2. Tournament Reports', '/reports/tournaments']],
     },
     'REPORTS_MENU_PLAYER': {
         'title': "Players' Reports Menu",
@@ -54,5 +54,9 @@ static_view_content = {
     'EXIT': {
         'title': 'QUIT CHESS MANAGER',
         'info': ['Are you sure you want to quit ChessManager ? (yes/no)'],
+    },
+    'REPORTS_MENU_TOURNAMENT': {
+        'title': "Tournaments' Reports Menu",
+        'info': ['Generate reports about tournaments.', 'Pick an option from the list below and press enter.', 'Press q and enter to navigate to main menu'],
     },
 }
