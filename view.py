@@ -85,15 +85,39 @@ class Menu(View):
         options = super().concatenate_with([option.text for option in self.options],"\n")
         return self.page_layout.format(self.title, info, options)
 
-class Report(View):
+class ExitPage(View):
+
+    def handle_user_input(self):
+        selected_option = input()
+        requested_route = ''
+        if selected_option == 'yes':
+            self.controller.exit()
+        else:
+            self.redirect_to(requested_route)
+
+    def format_view_content(self) -> str:
+        info = super().concatenate_with(self.info,"\n")
+        return self.page_layout.format(self.title, info)
+
+
+class FormField():
+    text: str
+    type: str
+    options: Optional[list[str]]
+
+    def __init__(self, text, type, options = []) -> None:
+        self.text = text
+        self.type = type
+        self.options = options
+
+class Report(Menu):
 
     search_results: list[str]
     table_headers: list
 
-    def __init__(self, name, router, title, info, search_results,table_headers) -> None:
-        super().__init__(name, router, title, info)
+    def __init__(self, controller, page_layout, title, info, options,search_results,table_headers) -> None:
+        super().__init__(controller, page_layout, title, info, options)
         self.search_results = search_results
-        self._page_layout = get_page_layout(self)
         self.table_headers = table_headers
 
     def build_table(self):
@@ -108,24 +132,17 @@ class Report(View):
         requested_route = ''
         if selected_option == get_quit_command():
             requested_route = get_exit_route()
+            self.redirect_to(requested_route)
         else:
-            requested_route = get_exit_route()
-        self.redirect_to(requested_route)
+            search_criteria = self.options[int(selected_option) - 1].route
+            self.controller.search(search_criteria)
+        
 
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info,"\n")
-        return self._page_layout.format(self.title, info, self.build_table())
+        options = super().concatenate_with([option.text for option in self.options],"\n")
+        return self.page_layout.format(self.title, info, self.build_table(),options)
 
-
-class FormField():
-    text: str
-    type: str
-    options: Optional[list[str]]
-
-    def __init__(self, text, type, options = []) -> None:
-        self.text = text
-        self.type = type
-        self.options = options
         
 class Completer(object):
     type_of_field_to_complete: str

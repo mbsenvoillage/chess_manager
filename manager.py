@@ -113,10 +113,10 @@ class TournamentManager(DataManager):
     def update(self, data: dict, tournament_id: str) -> None:
         scores = list(data.values())
         tournament = Tournament(**self.get_by_id(tournament_id))
-        players = [PlayerManager().get_by_id(id) for id in tournament.players]
         for idx, match in enumerate(tournament.rounds[-1].matches):
             score = 0.5 if scores[idx] == '0.5' else int(scores[idx])
             match.player_one_result = score
+        players = [PlayerManager().get_by_id(id) for id in tournament.players]
         updated_leaderboard = matchmaker.update_leaderboard(players,tournament)
         tournament.leaderboard = updated_leaderboard
         round = matchmaker.make_round(tournament)
@@ -131,10 +131,3 @@ class TournamentManager(DataManager):
 
     def get_by_id(self, tournament_id):
         return self.tournament_store.search(where('id') == tournament_id)[0]    
-
-
-l = {'one': 1, 'two': 2, 'three': 3}
-
-s = l.values()
-
-print(list(s))

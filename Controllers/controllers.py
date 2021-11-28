@@ -3,8 +3,9 @@ import copy
 from typing import Union
 from manager import PlayerManager, TournamentManager
 from Router.router import Router
-from settings_loader import get_default_form_layout, get_default_page_layout
+from settings_loader import get_default_form_layout, get_default_page_layout, get_default_report_layout
 from store import static_view_content
+
 class Controller(ABC):
     router: Router
     data_manager: Union[PlayerManager,TournamentManager]
@@ -29,6 +30,36 @@ class Controller(ABC):
     
     @abstractmethod
     def validate_command(self,command):
+        pass
+
+class ExitController(Controller):
+
+    def index(self,data):
+        from view import ExitPage
+        exit_page_content = static_view_content['EXIT']
+        layout = "\n \n{0} \n \n \n{1} \n"
+        return ExitPage(self, layout, *exit_page_content.values()).render()
+
+    def validate_command(self, command):
+        pass
+
+    def exit(self):
+        import os
+        os.system('cls' if os.name == 'nt' else 'reset')
+        exit()
+
+class ReportController(Controller):
+    
+    @abstractmethod
+    def index(self, data):
+        pass
+    
+    @abstractmethod
+    def validate_command(self, command):
+        pass
+
+    @abstractmethod
+    def search(self,search_criteria):
         pass
 
 class FormController(Controller):
@@ -78,6 +109,33 @@ class TournamentMenuController(Controller):
 
     def validate_command(self, command):
         pass
+
+class ReportsMenuController(Controller):
+
+    def index(self, data):
+        from view import Menu
+        reports_menu_content = static_view_content['REPORTS_MENU']
+        return Menu(self, get_default_page_layout(), *reports_menu_content.values()).render()
+
+    def validate_command(self, command):
+        pass
+
+class PlayerReportsController(ReportController):
+
+    def index(self, data):
+        from view import Report
+        player_reports_table_headers =['Last Name', 'First Name', 'Ranking', 'Birthdate']
+        players = data if data else [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in self.data_manager.get_all(order_by='alpha')]
+        reports_menu_player_content = static_view_content['REPORTS_MENU_PLAYER']
+        return Report(self, get_default_report_layout(), *reports_menu_player_content.values(),players,player_reports_table_headers).render()
+
+    def validate_command(self, command):
+        pass
+
+    def search(self, search_criteria: str):
+        order_by = list(filter(bool,search_criteria.split('/')))[0]
+        players = [[player.last_name,player.first_name,player.ranking,player.birthdate] for player in self.data_manager.get_all(order_by)]
+        self.index(players)
 
 class CreatePlayerFormController(FormController):
 
