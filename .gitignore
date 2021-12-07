@@ -1,5 +1,6 @@
 db.json
-flake-report
+flake-report/
+.vscode/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
