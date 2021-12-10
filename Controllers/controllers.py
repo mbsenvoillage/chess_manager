@@ -3,7 +3,7 @@ import copy
 from typing import Union
 from manager import PlayerManager, TournamentManager
 from Router.router import Router
-from settings_loader import get_default_form_layout, get_default_page_layout, get_default_report_layout
+from settings_loader import get_default_form_layout, get_default_page_layout, get_default_report_layout, get_quit_command
 from store import static_view_content
 
 
@@ -43,7 +43,7 @@ class ExitController(Controller):
         return ExitPage(self, layout, *exit_page_content.values()).render()
 
     def validate_command(self, command):
-        pass
+        return command in ['yes', 'no']
 
     def exit(self):
         import os
@@ -94,8 +94,18 @@ class MainMenuContoller(Controller):
                     main_menu_content.values()).render()
 
     def validate_command(self, command):
-        pass
+        return command in [get_quit_command(), '1', '2', '3', '4']
 
+class ErrorPageContoller(Controller):
+
+    def index(self, data):
+        from view import Menu
+        error_page_content = static_view_content['ERROR_PAGE']
+        return Menu(self, get_default_page_layout(), *
+                    error_page_content.values()).render()
+
+    def validate_command(self, command):
+        return command in ['1', '2']
 
 class PlayerMenuController(Controller):
 
@@ -106,7 +116,7 @@ class PlayerMenuController(Controller):
                     player_menu_content.values()).render()
 
     def validate_command(self, command):
-        pass
+        return command in [get_quit_command(), '1', '2']
 
 
 class TournamentMenuController(Controller):
@@ -119,7 +129,7 @@ class TournamentMenuController(Controller):
                     tournament_menu_content.values()).render()
 
     def validate_command(self, command):
-        pass
+        return command in [get_quit_command(), '1', '2']
 
 
 class ReportsMenuController(Controller):
@@ -131,7 +141,7 @@ class ReportsMenuController(Controller):
                     reports_menu_content.values()).render()
 
     def validate_command(self, command):
-        pass
+        return command in [get_quit_command(), '1', '2']
 
 
 class PlayerReportsController(ReportController):
@@ -159,7 +169,7 @@ class PlayerReportsController(ReportController):
             data_reports).render()
 
     def validate_command(self, command):
-        pass
+        return command in [get_quit_command(), '1', '2']
 
     def search(self, search_criteria: str):
         order_by = list(filter(bool, search_criteria.split('/')))[0]
@@ -189,7 +199,16 @@ class TournamentReportsMenuController(Controller):
             options).render()
 
     def validate_command(self, command):
-        pass
+        if command == 'q':
+            return True
+        else:
+            import re
+            regex = re.compile('[1-9]')
+            if bool(regex.match(command)):
+                option_num = int(command)
+                if option_num <= len(self.data_manager.get_all()) and option_num > 0:
+                    return True
+        return False
 
     def make_menu_options(self, base_route):
         option_list = []
@@ -234,7 +253,7 @@ class TournamentReportsController(ReportController):
             data_reports).render()
 
     def validate_command(self, command):
-        pass
+        return command in [get_quit_command(), '1', '2', '3', '4']
 
     def search(self, search_criteria: str):
         from prettytable import PrettyTable
@@ -288,7 +307,7 @@ class CreatePlayerFormController(FormController):
                     player_create_content.values()).render()
 
     def validate_command(self, command):
-        pass
+        return command in ['yes', 'no']
 
     def validate_input(self, input, field_type):
         return self.data_manager.validate(input, field_type)
@@ -313,7 +332,7 @@ class CreateTournamentFormController(FormController):
                 'players')).render()
 
     def validate_command(self, command):
-        pass
+        return command in ['yes', 'no']
 
     def validate_input(self, input, field_type):
         return self.data_manager.validate(input, field_type)
@@ -332,7 +351,18 @@ class EditPlayerMenuController(Controller):
                     edit_player_menu_content.values(), options).render()
 
     def validate_command(self, command):
-        pass
+        if command == 'q':
+            return True
+        else:
+            import re
+            regex = re.compile('[1-9]')
+            if bool(regex.match(command)):
+                option_num = int(command)
+                if option_num <= len(self.data_manager.get_all()) and option_num > 0:
+                    return True
+        return False
+        
+        
 
     def make_menu_options(self, base_route):
         list_of_options = []
@@ -352,7 +382,16 @@ class EditTournamentMenuController(Controller):
                     tournament_edit_content.values(), options).render()
 
     def validate_command(self, command):
-        pass
+        if command == 'q':
+            return True
+        else:
+            import re
+            regex = re.compile('[1-9]')
+            if bool(regex.match(command)):
+                option_num = int(command)
+                if option_num <= len(self.data_manager.get_all()) and option_num > 0:
+                    return True
+        return False
 
     def make_menu_options(self, base_route):
         option_list = []
@@ -375,7 +414,7 @@ class EditPlayerFormController(FormController):
         return form.render()
 
     def validate_command(self, command):
-        pass
+        return command in ['yes', 'no']
 
     def validate_input(self, input, field_type):
         return self.data_manager.validate(input, field_type)
@@ -392,7 +431,6 @@ class EditPlayerFormController(FormController):
             field.text = f"{original_field_text}{value}\nNew value : "
         return fields
 
-
 class EditTournamentFormController(FormController):
 
     def index(self, data):
@@ -405,7 +443,7 @@ class EditTournamentFormController(FormController):
         return form.render()
 
     def validate_command(self, command):
-        pass
+        return command in ['yes', 'no']
 
     def validate_input(self, input, field_type):
         return self.data_manager.validate(input, 'match')

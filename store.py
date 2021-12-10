@@ -128,4 +128,9 @@ static_view_content = {'MAIN_MENU': {'title': 'Welcome to ChessManager 1.0',
                                                                 '/allrounds'],
                                                                ['4. Print all games from tournament',
                                                                 '/allgames']]},
+                        'ERROR_PAGE': {
+                          'title': 'ERROR',
+                          'info': ['An unknown error occured'],
+                          'options': [['1. Go to main menu', '/'], ['2. Quit application', '/exit']]
+                        },
                        }

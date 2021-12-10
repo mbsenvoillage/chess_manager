@@ -7,3 +7,4 @@ try:
 except Exception as e:
     print(e)
     print(traceback.format_exc())
+    app.salvage_app()

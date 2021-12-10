@@ -2,7 +2,7 @@ from manager import PlayerManager, TournamentManager
 from Router.router import Router
 from Controllers.controllers import (CreatePlayerFormController, CreateTournamentFormController,
                                      EditPlayerFormController, EditPlayerMenuController,
-                                     EditTournamentFormController, EditTournamentMenuController,
+                                     EditTournamentFormController, EditTournamentMenuController, ErrorPageContoller,
                                      ExitController, MainMenuContoller, PlayerMenuController,
                                      PlayerReportsController, ReportsMenuController, TournamentMenuController,
                                      TournamentReportsController, TournamentReportsMenuController)
@@ -11,6 +11,7 @@ from Controllers.controllers import (CreatePlayerFormController, CreateTournamen
 class App():
 
     launch: callable
+    salvage_app: callable
 
     def __init__(self) -> None:
         router = Router()
@@ -31,6 +32,7 @@ class App():
         tournament_reports_menu = TournamentReportsMenuController(router, tournament_manager)
         tournament_reports = TournamentReportsController(router, tournament_manager)
         exit_controller = ExitController(router)
+        error_controller = ErrorPageContoller(router)
 
         router.add_route('/', main_menu_controller)
         router.add_route('/player', player_menu_controller)
@@ -45,9 +47,14 @@ class App():
         router.add_route('/reports/players', player_reports_controller)
         router.add_route('/reports/tournaments', tournament_reports_menu)
         router.add_route('/reports/tournament?', tournament_reports)
+        router.add_route('/error', error_controller)
         router.add_route('/exit', exit_controller)
 
         self.launch = router.start
+        self.salvage_app = lambda: router.route('/error')
 
     def run(self):
         self.launch()
+
+    def display_error_page(self):
+        self.salvage_app()

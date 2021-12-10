@@ -15,6 +15,7 @@ class View(ABC):
     info: List[str]
     controller: Union[Controller, FormController, ExitController, ReportController]
     page_layout: str
+    wrong_command_warning: str = "Please enter a valid command"
 
     def __init__(self, controller, page_layout, title, info) -> None:
         super().__init__()
@@ -47,6 +48,13 @@ class View(ABC):
 
     def _clear_terminal(self):
         os.system('cls' if os.name == 'nt' else 'reset')
+    
+    def validate_command(self, command):
+        selected_option = command
+        while not self.controller.validate_command(selected_option):
+            print(self.wrong_command_warning)
+            selected_option = input()
+        return selected_option
 
 
 class MenuOption():
@@ -69,12 +77,15 @@ class Menu(View):
             self.options.append(MenuOption(text=option[0], route=option[1]))
 
     def handle_user_input(self):
-        selected_option = input()
+        selected_option = self.validate_command(input())
         requested_route = ''
         if selected_option == get_quit_command():
             requested_route = get_exit_route()
         else:
-            requested_route = self.options[int(selected_option) - 1].route
+            try:
+                requested_route = self.options[int(selected_option) - 1].route
+            except ValueError as e:
+                raise e
         self.redirect_to(requested_route)
 
     def format_view_content(self) -> str:
@@ -86,12 +97,11 @@ class Menu(View):
 class ExitPage(View):
 
     def handle_user_input(self):
-        selected_option = input()
-        requested_route = ''
+        selected_option = self.validate_command(input())
         if selected_option == 'yes':
             self.controller.exit()
         else:
-            self.redirect_to(requested_route)
+            self.redirect_to('/')
 
     def format_view_content(self) -> str:
         info = super().concatenate_with(self.info, "\n")
@@ -118,13 +128,16 @@ class Report(Menu):
         self.data_reports = data_reports
 
     def handle_user_input(self):
-        selected_option = input()
+        selected_option = self.validate_command(input())
         requested_route = ''
         if selected_option == get_quit_command():
             requested_route = get_exit_route()
             self.redirect_to(requested_route)
         else:
-            search_criteria = self.options[int(selected_option) - 1].route
+            try:
+                search_criteria = self.options[int(selected_option) - 1].route
+            except ValueError as e:
+                raise e
             self.controller.search(search_criteria)
 
     def format_view_content(self) -> str:
@@ -183,7 +196,7 @@ class Form(View):
                 if not is_input_valid:
                     print("Submitted data is incorrect. Please enter valid data.")
             inputs[field.type] = user_input
-        send_data = input('Do you want to add the data to the database ? (yes/no) ')
+        send_data = self.validate_command(input('Do you want to add the data to the database ? (yes/no) '))
         if send_data == 'yes':
             self.submit_data(inputs)
         self.redirect_to('/')
@@ -213,7 +226,7 @@ class FormEdit(Form):
                 user_input = input(field.text)
                 is_input_valid = self.is_valid(user_input, field.type)
             inputs[field.type] = user_input
-        data_is_to_be_edited = input('Do you want to continue with this update ? (answer by yes or no) ')
+        data_is_to_be_edited = self.validate_command(input('Do you want to continue with this update ? (answer by yes or no) '))
         if data_is_to_be_edited == 'yes':
             self.submit_data(inputs)
         self.redirect_to('/player/edit/menu')
