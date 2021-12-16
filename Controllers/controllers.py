@@ -294,10 +294,6 @@ class TournamentReportsController(ReportController):
             data.append(y)
         self.index(data)
 
-    def build_table(self, table_headers, search_results):
-        pass
-
-
 class CreatePlayerFormController(FormController):
 
     def index(self, data):
