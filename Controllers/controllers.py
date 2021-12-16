@@ -358,8 +358,6 @@ class EditPlayerMenuController(Controller):
                     return True
         return False
         
-        
-
     def make_menu_options(self, base_route):
         list_of_options = []
         for index, player in enumerate(self.data_manager.get_all()):

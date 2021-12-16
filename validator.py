@@ -1,32 +1,49 @@
-from datetime import date
+from datetime import date, datetime
+from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from player import Player
 
-
 def validate_player_firstname(name: str) -> bool:
-    # trim
-    # min_length=2 max_length=25
-    return True
-
+    import re
+    name = name.strip()
+    if len(name) < 2 or len(name) > 25:
+        return False
+    regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
+    return regex.match(name)
 
 def validate_player_lastname(name: str) -> bool:
-    # trim
-    # min_length=2 max_length=25
-    return True
+    import re
+    name = name.strip()         
+    if len(name) < 2 or len(name) > 25:
+        return False
+    regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
+    return regex.match(name)
 
 
 def validate_player_birthdate(birthdate: str) -> bool:
     # players must be at least 6
-    return True
-
+    try:
+        isValid = parser.parse(birthdate) < (datetime.today() - relativedelta(years=6))
+        return isValid
+    except Exception as e:
+        return False
 
 def validate_player_ranking(ranking: str) -> bool:
-    # min=1 #max=3000
-    return True
+    # min=300 #max=3000
+    try:
+        isValid = int(ranking) > 300 and int(ranking) < 3000
+        return isValid
+    except Exception as e:
+        return False
 
 
-def validate_player_gender(gender) -> bool:
+def validate_player_gender(gender: str) -> bool:
     # m/f case insensitive
-    return True
+    try:
+        isValid = gender.lower() in ['m', 'f']
+        return isValid
+    except Exception as e:
+        return False
 
 
 player_validators = {
@@ -39,35 +56,67 @@ player_validators = {
 
 
 def validate_tournament_name(name: str) -> bool:
-    return True
-
+    import re
+    name = name.strip()
+    if len(name) < 2 or len(name) > 25:
+        return False
+    regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
+    return regex.match(name) and len(name) > 2 and len(name) < 100
 
 def validate_tournament_venue(name: str) -> bool:
-    return True
+    import re
+    name = name.strip()
+    if len(name) < 2 or len(name) > 25:
+        return False
+    regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
+    return regex.match(name) and len(name) > 2 and len(name) < 100
 
 
-def validate_tournament_start_date(start_date: date) -> bool:
-    return True
+def validate_tournament_start_date(start_date: str) -> bool:
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    try:
+        isValid = parser.parse(f'{start_date} {current_time}') >= (datetime.now() - relativedelta(hours=1))
+        return isValid
+    except Exception as e:
+        return False
 
 
-def validate_tournament_end_date(end_date: date) -> bool:
-    return True
-
+def validate_tournament_end_date(end_date: str) -> bool:
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    try:
+        isValid = parser.parse(f'{end_date} {current_time}') >= (datetime.now() - relativedelta(hours=1))
+        return isValid
+    except Exception as e:
+        return False
 
 def validate_tournament_number_of_rounds(number_of_rounds: int) -> bool:
-    return True
+    try:
+        isValid = int(number_of_rounds) >= 4
+        return isValid
+    except Exception as e:
+        return False
 
 
 def validate_tournament_players(players: list[Player]) -> bool:
-    return True
+    try:
+        isValid = int(players) >= 8
+        return isValid
+    except Exception as e:
+        return False
 
 
 def validate_tournament_time_control(time_control: str) -> bool:
-    return True
+    try:
+        isValid = time_control.lower() in ['blitz', 'rapid', 'bullet']
+        return isValid
+    except Exception as e:
+        return False
 
 
 def validate_tournament_comments(comments: str) -> bool:
-    return True
+    return len(comments) < 2000
 
 
 def validate_tournament_match(score: str) -> bool:
