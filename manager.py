@@ -99,13 +99,16 @@ class TournamentManager(DataManager):
             db_response = self.player_manager.get_by_identity(
                 query_words[0], query_words[1], query_words[2], int(query_words[3]))[0]
             players.append(db_response['id'])
+        number_of_rounds = data['number_of_rounds']
+        if not number_of_rounds:
+            number_of_rounds = 4
         params = {
             'id': id,
             'name': data['name'],
             'venue': data['venue'],
             'start_date': data['start_date'],
             'end_date': data['end_date'],
-            'number_of_rounds': data['number_of_rounds'],
+            'number_of_rounds': number_of_rounds,
             'rounds': [],
             'players': players,
             'time_control': data['time_control'],
