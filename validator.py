@@ -73,39 +73,64 @@ def validate_tournament_venue(name: str) -> bool:
 
 
 def validate_tournament_start_date(start_date: str) -> bool:
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    try:
-        isValid = parser.parse(f'{start_date} {current_time}') >= (datetime.now() - relativedelta(hours=1))
-        return isValid
-    except Exception as e:
-        return False
+    isValid: bool
+    if len(start_date) is not 10:
+        isValid = False
+    else:
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        try:
+            isValid = parser.parse(f'{start_date} {current_time}') >= (datetime.now() - relativedelta(hours=1))
+        except Exception as e:
+            isValid = False
+    return isValid
 
 
 def validate_tournament_end_date(end_date: str) -> bool:
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+    isValid: bool
+    if len(end_date) is not 10:
+        isValid = False
+    else:
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        try:
+            isValid = parser.parse(f'{end_date} {current_time}') >= (datetime.now() - relativedelta(hours=1))
+        except Exception as e:
+            isValid = False
+    return isValid
+
+def validate_tournament_number_of_rounds(number_of_rounds: str) -> bool:
+    isValid: bool
     try:
-        isValid = parser.parse(f'{end_date} {current_time}') >= (datetime.now() - relativedelta(hours=1))
-        return isValid
+        # field can be left empty since default value is 4
+        if not number_of_rounds:
+            isValid = True
+        else:
+            isValid = int(number_of_rounds) >= 4
     except Exception as e:
-        return False
+        isValid = False
+    return isValid
 
-def validate_tournament_number_of_rounds(number_of_rounds: int) -> bool:
+
+def validate_tournament_players(players: str) -> bool:
+    from manager import PlayerManager
+    isValid: bool
+    valid_players = [repr(player) for player in PlayerManager().get_all()]
     try:
-        isValid = int(number_of_rounds) >= 4
-        return isValid
+        list_of_players = list(filter(bool, players.split(' / ')))
+        # list shouldn't contain duplicates
+        if len(list_of_players) != len(set(list_of_players)):
+            isValid = False
+        else:
+            # submitted players should be valid
+            for player in list_of_players:
+                valid_player = player + ' / '
+                if valid_player not in valid_players:
+                    return False
+            isValid = len(list_of_players) >= 8
     except Exception as e:
-        return False
-
-
-def validate_tournament_players(players: list[Player]) -> bool:
-    try:
-        isValid = int(players) >= 8
-        return isValid
-    except Exception as e:
-        return False
-
+        isValid = False
+    return isValid
 
 def validate_tournament_time_control(time_control: str) -> bool:
     try:
