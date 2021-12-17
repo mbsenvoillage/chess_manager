@@ -1,6 +1,6 @@
 import copy
 from typing import Dict
-from tournament import Match, Round, Tournament
+from Model.tournament import Match, Round, Tournament
 
 
 def split_list(a_list) -> set:
@@ -37,7 +37,7 @@ def generate_round_matches(leaderboard):
 
 
 def init_leader_board(players: list[str]) -> dict:
-    from manager import PlayerManager
+    from DAL.manager import PlayerManager
     leaderboard = {}
     for id in players:
         player = PlayerManager().get_by_id(id)
@@ -92,7 +92,7 @@ def update_leaderboard(players: list[dict], tournament: Tournament) -> dict:
 
 
 def make_round(tournament: Tournament) -> Round:
-    from manager import PlayerManager
+    from DAL.manager import PlayerManager
     tournament = copy.deepcopy(tournament)
     players = [PlayerManager().get_by_id(id) for id in tournament.players]
     if no_rounds_played(tournament):
@@ -116,7 +116,7 @@ def make_round(tournament: Tournament) -> Round:
 
 
 def format_leader_board(leaderboard: Dict):
-    from manager import PlayerManager
+    from DAL.manager import PlayerManager
     str_leaderboard = ''
     for playerId, array in leaderboard.items():
         str_leaderboard += f"{PlayerManager().get_by_id(playerId)['last_name']} : {array[1]}\n"

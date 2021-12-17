@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 import copy
 from typing import Union
-from manager import PlayerManager, TournamentManager
+from DAL.manager import PlayerManager, TournamentManager
 from Router.router import Router
-from settings_loader import get_default_form_layout, get_default_page_layout, get_default_report_layout, get_quit_command
-from store import static_view_content
+from utils.settings_loader import get_default_form_layout, get_default_page_layout, get_default_report_layout, get_quit_command
+from View.store import static_view_content
 
 
 class Controller(ABC):
@@ -37,7 +37,7 @@ class Controller(ABC):
 class ExitController(Controller):
 
     def index(self, data):
-        from view import ExitPage
+        from View.view import ExitPage
         exit_page_content = static_view_content['EXIT']
         layout = "\n \n{0} \n \n \n{1} \n"
         return ExitPage(self, layout, *exit_page_content.values()).render()
@@ -88,7 +88,7 @@ class FormController(Controller):
 class MainMenuContoller(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         main_menu_content = static_view_content['MAIN_MENU']
         return Menu(self, get_default_page_layout(), *
                     main_menu_content.values()).render()
@@ -99,7 +99,7 @@ class MainMenuContoller(Controller):
 class ErrorPageContoller(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         error_page_content = static_view_content['ERROR_PAGE']
         return Menu(self, get_default_page_layout(), *
                     error_page_content.values()).render()
@@ -110,7 +110,7 @@ class ErrorPageContoller(Controller):
 class PlayerMenuController(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         player_menu_content = static_view_content['PLAYER_MENU']
         return Menu(self, get_default_page_layout(), *
                     player_menu_content.values()).render()
@@ -122,7 +122,7 @@ class PlayerMenuController(Controller):
 class TournamentMenuController(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         tournament_menu_content = tournament_menu_content = static_view_content[
             'TOURNAMENT_MENU']
         return Menu(self, get_default_page_layout(), *
@@ -135,7 +135,7 @@ class TournamentMenuController(Controller):
 class ReportsMenuController(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         reports_menu_content = static_view_content['REPORTS_MENU']
         return Menu(self, get_default_page_layout(), *
                     reports_menu_content.values()).render()
@@ -147,7 +147,7 @@ class ReportsMenuController(Controller):
 class PlayerReportsController(ReportController):
 
     def index(self, data):
-        from view import Report
+        from View.view import Report
         player_reports_table_headers = [
             'Last Name', 'First Name', 'Ranking', 'Birthdate']
         players = data if data else [
@@ -189,7 +189,7 @@ class PlayerReportsController(ReportController):
 class TournamentReportsMenuController(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         tournaments_reports_content = static_view_content['REPORTS_MENU_TOURNAMENT']
         options = self.make_menu_options('/reports/tournament?id=')
         return Menu(
@@ -227,7 +227,7 @@ class TournamentReportsMenuController(Controller):
 class TournamentReportsController(ReportController):
 
     def index(self, data):
-        from view import Report
+        from View.view import Report
         from prettytable import PrettyTable
         data_reports = []
         layout = get_default_report_layout()
@@ -297,7 +297,7 @@ class TournamentReportsController(ReportController):
 class CreatePlayerFormController(FormController):
 
     def index(self, data):
-        from view import Form
+        from View.view import Form
         player_create_content = static_view_content['PLAYER_CREATE']
         return Form(self, get_default_form_layout(), *
                     player_create_content.values()).render()
@@ -315,7 +315,7 @@ class CreatePlayerFormController(FormController):
 class CreateTournamentFormController(FormController):
 
     def index(self, data):
-        from view import Form, Completer
+        from View.view import Form, Completer
         tournament_create_content = static_view_content['TOURNAMENT_CREATE']
         def players_for_autocomplete(): return [
             repr(player) for player in self.data_manager.player_manager.get_all()]
@@ -340,7 +340,7 @@ class CreateTournamentFormController(FormController):
 class EditPlayerMenuController(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         edit_player_menu_content = static_view_content['PLAYER_EDIT_MENU']
         options = self.make_menu_options('/player/edit/form?id=')
         return Menu(self, get_default_page_layout(), *
@@ -369,7 +369,7 @@ class EditPlayerMenuController(Controller):
 class EditTournamentMenuController(Controller):
 
     def index(self, data):
-        from view import Menu
+        from View.view import Menu
         tournament_edit_content = static_view_content['TOURNAMENT_EDIT_MENU']
         options = self.make_menu_options('/tournament/edit/form?id=')
         return Menu(self, get_default_page_layout(), *
@@ -398,7 +398,7 @@ class EditTournamentMenuController(Controller):
 class EditPlayerFormController(FormController):
 
     def index(self, data):
-        from view import FormEdit
+        from View.view import FormEdit
         edit_player_form_content = static_view_content['PLAYER_EDIT_FORM']
         form = FormEdit(self, get_default_form_layout(),
                         *edit_player_form_content.values())
@@ -428,7 +428,7 @@ class EditPlayerFormController(FormController):
 class EditTournamentFormController(FormController):
 
     def index(self, data):
-        from view import Form
+        from View.view import Form
         edit_tournament_form_content = static_view_content['TOURNAMENT_EDIT_FORM']
         form = Form(self, get_default_form_layout(), *
                     edit_tournament_form_content.values(), form_fields=[])
@@ -446,7 +446,7 @@ class EditTournamentFormController(FormController):
         self.data_manager.update(inputs, self.data_id)
 
     def make_form(self, entity: dict):
-        from view import FormField
+        from View.view import FormField
         fields = []
         for idx, match in enumerate(entity['rounds'][-1]['matches']):
             field_params = {'type': f'match{idx+1}'}

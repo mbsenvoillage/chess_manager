@@ -1,7 +1,7 @@
 from datetime import date
 from pydantic import BaseModel, validator, PositiveInt
 from pydantic.types import constr
-from enums import Gender
+from Model.enums import Gender
 from dateutil.relativedelta import relativedelta
 import names
 import random
@@ -24,6 +24,28 @@ class Player(BaseModel):
     def player_must_be_at_least_six(cls, value):
         if value > (date.today() - relativedelta(years=6)):
             raise ValueError('Player must be at least six years old')
+        return value
+
+    @validator('first_name')
+    def first_name_validator(cls, value):
+        import re
+        name = value.strip()
+        if len(name) < 3 or len(name) > 25:
+            raise ValueError("Player's first name must contain at least two letters and no more than 25")
+        regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
+        if not regex.match(name):
+            raise ValueError("Player's first name cannot contain numbers or special characters")
+        return value
+
+    @validator('last_name')
+    def first_name_validator(cls, value):
+        import re
+        name = value.strip()
+        if len(name) < 3 or len(name) > 25:
+            raise ValueError("Player's last name must contain at least two letters and no more than 25")
+        regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
+        if not regex.match(name):
+            raise ValueError("Player's last name cannot contain numbers or special characters")
         return value
 
     def __init__(self, **data) -> None:

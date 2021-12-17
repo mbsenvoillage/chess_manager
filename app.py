@@ -1,4 +1,4 @@
-from manager import PlayerManager, TournamentManager
+from DAL.manager import PlayerManager, TournamentManager
 from Router.router import Router
 from Controllers.controllers import (CreatePlayerFormController, CreateTournamentFormController,
                                      EditPlayerFormController, EditPlayerMenuController,

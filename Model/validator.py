@@ -1,12 +1,12 @@
 from datetime import date, datetime
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
-from player import Player
+from Model.player import Player
 
 def validate_player_firstname(name: str) -> bool:
     import re
     name = name.strip()
-    if len(name) < 2 or len(name) > 25:
+    if len(name) < 3 or len(name) > 25:
         return False
     regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
     return regex.match(name)
@@ -14,7 +14,7 @@ def validate_player_firstname(name: str) -> bool:
 def validate_player_lastname(name: str) -> bool:
     import re
     name = name.strip()         
-    if len(name) < 2 or len(name) > 25:
+    if len(name) < 3 or len(name) > 25:
         return False
     regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
     return regex.match(name)
@@ -113,7 +113,7 @@ def validate_tournament_number_of_rounds(number_of_rounds: str) -> bool:
 
 
 def validate_tournament_players(players: str) -> bool:
-    from manager import PlayerManager
+    from DAL.manager import PlayerManager
     isValid: bool
     valid_players = [repr(player) for player in PlayerManager().get_all()]
     try:

@@ -1,9 +1,9 @@
 from typing import Dict, List
 from abc import ABC, abstractmethod
 import json
-from player import Player
-from tournament import Tournament
-import validator
+from Model.player import Player
+from Model.tournament import Tournament
+import Model.validator as validator
 from dotenv import load_dotenv
 from database import players, tournaments
 import uuid

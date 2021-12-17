@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import List, Optional, Union
 import os
-from settings_loader import get_exit_route, get_quit_command
+from utils.settings_loader import get_exit_route, get_quit_command
 import readline
 from prettytable import PrettyTable
 

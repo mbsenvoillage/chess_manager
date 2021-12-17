@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from datetime import date
 import copy
-from enums import TimeControl
+from Model.enums import TimeControl
 
 
 class Match(BaseModel):
