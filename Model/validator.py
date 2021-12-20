@@ -1,7 +1,6 @@
-from datetime import date, datetime
+from datetime import datetime
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
-from Model.player import Player
 
 def validate_player_firstname(name: str) -> bool:
     import re
@@ -58,16 +57,12 @@ player_validators = {
 def validate_tournament_name(name: str) -> bool:
     import re
     name = name.strip()
-    if len(name) < 2 or len(name) > 25:
-        return False
     regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
     return regex.match(name) and len(name) > 2 and len(name) < 100
 
 def validate_tournament_venue(name: str) -> bool:
     import re
     name = name.strip()
-    if len(name) < 2 or len(name) > 25:
-        return False
     regex = re.compile("^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$")
     return regex.match(name) and len(name) > 2 and len(name) < 100
 
