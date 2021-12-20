@@ -31,7 +31,7 @@ def validate_player_birthdate(birthdate: str) -> bool:
 def validate_player_ranking(ranking: str) -> bool:
     # min=300 #max=3000
     try:
-        isValid = int(ranking) > 300 and int(ranking) < 3000
+        isValid = int(ranking) > 300 and int(ranking) <= 3000
         return isValid
     except Exception as e:
         return False
