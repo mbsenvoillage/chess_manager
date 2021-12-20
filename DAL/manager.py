@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, List
 from abc import ABC, abstractmethod
 import json
@@ -125,11 +126,13 @@ class TournamentManager(DataManager):
         for idx, match in enumerate(tournament.rounds[-1].matches):
             score = 0.5 if scores[idx] == '0.5' else int(scores[idx])
             match.player_one_result = score
+        tournament.rounds[-1].end_time = datetime.now()
         players = [PlayerManager().get_by_id(id) for id in tournament.players]
         updated_leaderboard = matchmaker.update_leaderboard(players, tournament)
         tournament.leaderboard = updated_leaderboard
-        round = matchmaker.make_round(tournament)
-        tournament.rounds.append(round)
+        if len(tournament.rounds) != tournament.number_of_rounds:
+            round = matchmaker.make_round(tournament)
+            tournament.rounds.append(round)
         self.tournament_store.update(json.loads(tournament.json()), where('id') == tournament_id)
 
     def get_all(self) -> List[Tournament]:

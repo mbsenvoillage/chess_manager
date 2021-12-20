@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import copy
+from datetime import date
 from typing import Union
 from DAL.manager import PlayerManager, TournamentManager
 from Router.router import Router
@@ -297,12 +298,16 @@ class TournamentReportsController(ReportController):
             formatted_round_games = self.data_manager.get_all_games(
                 self.data_id)
             data.append(x)
-            y = PrettyTable()
-            for round in formatted_round_games:
-                round_name = round[0]
-                round_games = round[1]
-                y.add_column(round_name, round_games)
-            data.append(y)
+            if len(formatted_round_games) > 1 :
+                y = PrettyTable()
+                y.max_table_width = 140
+                for round in formatted_round_games:
+                    round_name = round[0]
+                    round_games = round[1]
+                    y.add_column(round_name, round_games)
+                data.append(y)
+            else:
+                data.append("No games have been played yet")
         self.index(data)
 
 class CreatePlayerFormController(FormController):
@@ -402,9 +407,15 @@ class EditTournamentMenuController(Controller):
 
     def make_menu_options(self, base_route):
         option_list = []
-        for index, tournament in enumerate(self.data_manager.get_all()):
-            option_list.append(
-                [f"{index+1}. {tournament.name} - Venue: {tournament.venue}", f"{base_route}{tournament.id}"])
+        index = 1
+        for tournament in self.data_manager.get_all():
+            today = date.today()
+            if len(tournament.rounds) <= tournament.number_of_rounds and tournament.end_date >= today and tournament.rounds[-1].end_time is None:
+                option_list.append(
+                    [f"{index}. {tournament.name} - Venue: {tournament.venue}", f"{base_route}{tournament.id}"])
+                index += 1
+        if len(option_list) == 0:
+                option_list.append(["1. There are no tournaments to edit, press q to or 1 to quit", "/"])
         return option_list
 
 
@@ -466,7 +477,7 @@ class EditTournamentFormController(FormController):
             player_one = PlayerManager().get_by_id(match['player_one'])
             player_two = PlayerManager().get_by_id(match['player_two'])
             text = (f"{player_one['first_name']} {player_one['last_name']}"
-                    f"vs {player_two['first_name']} {player_two['last_name']}\n"
+                    f" vs {player_two['first_name']} {player_two['last_name']}\n"
                     f"{player_one['first_name']} {player_one['last_name']}'s score : ")
             field_params['text'] = text
             field = FormField(**field_params)

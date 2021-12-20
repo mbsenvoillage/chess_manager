@@ -15,8 +15,8 @@ class Match(BaseModel):
 
 class Round(BaseModel):
     name: str
-    start_time: Optional[date]
-    end_time: Optional[date]
+    start_time: Optional[datetime]
+    end_time: Optional[datetime]
     matches: List[Match]
 
 
@@ -61,16 +61,8 @@ class Tournament(BaseModel):
             raise ValueError('The venue name should be no longer than 100 characters and contain alpha characters only')
         return value
     
-    @validator('start_date')
-    def start_date_validator(cls, value):
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        if not (parser.parse(f'{value} {current_time}') >= (datetime.now() - relativedelta(hours=1))):
-            raise ValueError('The start date should be posterior to this moment minus an hour')
-        return value
-
     @validator('end_date')
-    def end_date_validator(cls, value, values):
+    def end_date_validator(cls, value, values, **kwargs):
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         if not (parser.parse(f'{value} {current_time}') >= (parser.parse(f"{values['start_date']} {current_time}"))):

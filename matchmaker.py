@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 from typing import Dict
 from Model.tournament import Match, Round, Tournament
 
@@ -97,7 +98,7 @@ def make_round(tournament: Tournament) -> Round:
     players = [PlayerManager().get_by_id(id) for id in tournament.players]
     if no_rounds_played(tournament):
         players.sort(key=lambda player: player['ranking'], reverse=True)
-        round1 = Round(name='Round1', matches=generate_first_round_matches(*split_list(players)))
+        round1 = Round(name='Round1', matches=generate_first_round_matches(*split_list(players)), start_time=datetime.now())
         return round1
     else:
         if all_rounds_played(tournament):
@@ -108,7 +109,8 @@ def make_round(tournament: Tournament) -> Round:
             new_round = Round(
                 name=f"Round{len(tournament.rounds)+1}",
                 matches=generate_round_matches(
-                    tournament.leaderboard))
+                    tournament.leaderboard),
+                    start_time=datetime.now())
         except Exception as e:
             print("Tournament cannot go on with the current matching system")
             raise e
