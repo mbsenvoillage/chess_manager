@@ -107,6 +107,17 @@ class ErrorPageContoller(Controller):
     def validate_command(self, command):
         return command in ['1', '2']
 
+class NotEnoughPlayersErrorPageContoller(Controller):
+
+    def index(self, data):
+        from View.view import Menu
+        error_page_content = static_view_content['NOT_ENOUGH_PLAYERS_ERROR_PAGE']
+        return Menu(self, get_default_page_layout(), *
+                    error_page_content.values()).render()
+
+    def validate_command(self, command):
+        return command in ['1', '2']
+
 class PlayerMenuController(Controller):
 
     def index(self, data):
@@ -317,6 +328,8 @@ class CreateTournamentFormController(FormController):
     def index(self, data):
         from View.view import Form, Completer
         tournament_create_content = static_view_content['TOURNAMENT_CREATE']
+        if len(self.data_manager.player_manager.get_all()) < 8:
+            return self.redirect_to('/notenoughplayers')
         def players_for_autocomplete(): return [
             repr(player) for player in self.data_manager.player_manager.get_all()]
         return Form(

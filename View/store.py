@@ -133,4 +133,9 @@ static_view_content = {'MAIN_MENU': {'title': 'Welcome to ChessManager 1.0',
                           'info': ['An unknown error occured'],
                           'options': [['1. Go to main menu', '/'], ['2. Quit application', '/exit']]
                         },
+                        'NOT_ENOUGH_PLAYERS_ERROR_PAGE': {
+                          'title': 'ERROR',
+                          'info': ["There aren't enough players in the database to create a tournament"],
+                          'options': [['1. Go to main menu', '/'], ['2. Quit application', '/exit']]
+                        },
                        }

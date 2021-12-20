@@ -3,7 +3,7 @@ from Router.router import Router
 from Controllers.controllers import (CreatePlayerFormController, CreateTournamentFormController,
                                      EditPlayerFormController, EditPlayerMenuController,
                                      EditTournamentFormController, EditTournamentMenuController, ErrorPageContoller,
-                                     ExitController, MainMenuContoller, PlayerMenuController,
+                                     ExitController, MainMenuContoller, NotEnoughPlayersErrorPageContoller, PlayerMenuController,
                                      PlayerReportsController, ReportsMenuController, TournamentMenuController,
                                      TournamentReportsController, TournamentReportsMenuController)
 
@@ -33,6 +33,7 @@ class App():
         tournament_reports = TournamentReportsController(router, tournament_manager)
         exit_controller = ExitController(router)
         error_controller = ErrorPageContoller(router)
+        not_enough_players_controller = NotEnoughPlayersErrorPageContoller(router)
 
         router.add_route('/', main_menu_controller)
         router.add_route('/player', player_menu_controller)
@@ -48,6 +49,7 @@ class App():
         router.add_route('/reports/tournaments', tournament_reports_menu)
         router.add_route('/reports/tournament?', tournament_reports)
         router.add_route('/error', error_controller)
+        router.add_route('/notenoughplayers', not_enough_players_controller)
         router.add_route('/exit', exit_controller)
 
         self.launch = router.start
