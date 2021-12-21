@@ -298,7 +298,7 @@ class TournamentReportsController(ReportController):
             formatted_round_games = self.data_manager.get_all_games(
                 self.data_id)
             data.append(x)
-            if len(formatted_round_games) > 1 :
+            if len(formatted_round_games) >= 1 :
                 y = PrettyTable()
                 y.max_table_width = 140
                 for round in formatted_round_games:
